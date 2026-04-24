@@ -1,0 +1,54 @@
+{
+  "benchmark": "niah",
+  "context_length": 16384,
+  "config": "dense",
+  "smoke": false,
+  "quality": {
+    "metric": "accuracy",
+    "value": 0.7,
+    "n_samples": null
+  },
+  "system": {},
+  "native": {
+    "heatmaps": {
+      "dense": {
+        "16K_d0.0": 1.0,
+        "16K_d0.1": 0.6666666666666666,
+        "16K_d0.2": 0.6666666666666666,
+        "16K_d0.3": 0.6666666666666666,
+        "16K_d0.4": 0.3333333333333333,
+        "16K_d0.5": 0.6666666666666666,
+        "16K_d0.6": 1.0,
+        "16K_d0.7": 0.6666666666666666,
+        "16K_d0.8": 0.3333333333333333,
+        "16K_d0.9": 1.0
+      },
+      "certified": {
+        "16K_d0.0": 0.6666666666666666,
+        "16K_d0.1": 0.3333333333333333,
+        "16K_d0.2": 0.6666666666666666,
+        "16K_d0.3": 0.6666666666666666,
+        "16K_d0.4": 0.6666666666666666,
+        "16K_d0.5": 0.6666666666666666,
+        "16K_d0.6": 0.6666666666666666,
+        "16K_d0.7": 0.6666666666666666,
+        "16K_d0.8": 0.3333333333333333,
+        "16K_d0.9": 0.6666666666666666
+      }
+    },
+    "dense_accuracy": 0.7,
+    "certified_accuracy": 0.6,
+    "critical_failures": 4
+  },
+  "meta": {
+    "model": "NousResearch/Meta-Llama-3.1-8B",
+    "model_quant": "int8-bitsandbytes",
+    "hardware": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition sm_120",
+    "timestamp": "2026-04-20T22:17:04.256206+00:00",
+    "started": "2026-04-20T22:10:52.146798+00:00",
+    "wall_seconds": 372.1094077602029,
+    "git_sha": "faf7dbd8",
+    "exit_code": 0,
+    "params": {}
+  }
+}

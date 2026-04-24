@@ -1,0 +1,78 @@
+{
+  "hardware": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+  "model": "NousResearch/Meta-Llama-3.1-8B",
+  "context_length": 65536,
+  "decode_tokens": 256,
+  "warmup_tokens": 16,
+  "repeats": 3,
+  "seq_len": 65536,
+  "per_config": {
+    "dense": [
+      {
+        "config": "dense",
+        "tok_per_sec": 19.7656624664214,
+        "ms_per_token_mean": 50.59278947512309,
+        "ms_per_token_median": 50.63679885864258,
+        "ms_per_token_p50": 50.63679885864258,
+        "ms_per_token_p95": 53.010433197021484,
+        "ms_per_token_p99": 54.002689361572266,
+        "ms_per_token_min": 46.496768951416016,
+        "ms_per_token_max": 55.13932800292969,
+        "prefill_time_ms": 7563.563684001565,
+        "prefill_time_dense_ms": 7563.56032891199,
+        "decode_tokens_measured": 240,
+        "decode_tokens_warmup": 16,
+        "gpu_mem_peak_mb": 57634.55126953125,
+        "seq_len": 65536
+      },
+      {
+        "config": "dense",
+        "tok_per_sec": 19.90892329970575,
+        "ms_per_token_mean": 50.22873336474101,
+        "ms_per_token_median": 50.24870300292969,
+        "ms_per_token_p50": 50.24870300292969,
+        "ms_per_token_p95": 52.82099151611328,
+        "ms_per_token_p99": 54.10508728027344,
+        "ms_per_token_min": 45.860862731933594,
+        "ms_per_token_max": 56.15411376953125,
+        "prefill_time_ms": 7337.041096296161,
+        "prefill_time_dense_ms": 7337.04032516107,
+        "decode_tokens_measured": 240,
+        "decode_tokens_warmup": 16,
+        "gpu_mem_peak_mb": 57634.55126953125,
+        "seq_len": 65536
+      },
+      {
+        "config": "dense",
+        "tok_per_sec": 20.071910122049594,
+        "ms_per_token_mean": 49.820868762334186,
+        "ms_per_token_median": 49.70598220825195,
+        "ms_per_token_p50": 49.70598220825195,
+        "ms_per_token_p95": 51.767295837402344,
+        "ms_per_token_p99": 52.75852966308594,
+        "ms_per_token_min": 45.96940612792969,
+        "ms_per_token_max": 53.58095932006836,
+        "prefill_time_ms": 7341.059093829244,
+        "prefill_time_dense_ms": 7341.057992074639,
+        "decode_tokens_measured": 240,
+        "decode_tokens_warmup": 16,
+        "gpu_mem_peak_mb": 57634.55126953125,
+        "seq_len": 65536
+      }
+    ]
+  },
+  "summary": {
+    "dense": {
+      "n_repeats": 3,
+      "tok_per_sec_mean": 19.91549862939225,
+      "tok_per_sec_std": 0.1532296735779525,
+      "tok_per_sec_min": 19.7656624664214,
+      "tok_per_sec_max": 20.071910122049594,
+      "ms_per_token_p50_median": 50.24870300292969,
+      "ms_per_token_p95_median": 52.82099151611328,
+      "ms_per_token_p99_median": 54.002689361572266,
+      "prefill_time_ms_median": 7341.059093829244,
+      "gpu_mem_peak_mb_max": 57634.55126953125
+    }
+  }
+}

@@ -1,0 +1,420 @@
+{
+  "benchmark": "pg19_perplexity",
+  "model": "NousResearch/Meta-Llama-3.1-8B",
+  "context_length": 4096,
+  "num_chunks": 20,
+  "eval_start_frac": 0.5,
+  "concentration_threshold": 0.0,
+  "default_epsilon_override": 0.0001,
+  "top_k_override": null,
+  "dense": {
+    "perplexity": 9.94160618965474,
+    "total_nll": 188102.07202148438,
+    "total_tokens": 81900,
+    "per_chunk": [
+      {
+        "chunk_idx": 0,
+        "book_idx": 0,
+        "nll": 7510.46044921875,
+        "tokens": 4095
+      },
+      {
+        "chunk_idx": 1,
+        "book_idx": 0,
+        "nll": 8016.1004638671875,
+        "tokens": 4095
+      },
+      {
+        "chunk_idx": 2,
+        "book_idx": 0,
+        "nll": 8131.9481201171875,
+        "tokens": 4095
+      },
+      {
+        "chunk_idx": 3,
+        "book_idx": 0,
+        "nll": 7792.4129638671875,
+        "tokens": 4095
+      },
+      {
+        "chunk_idx": 4,
+        "book_idx": 0,
+        "nll": 7911.846130371094,
+        "tokens": 4095
+      },
+      {
+        "chunk_idx": 5,
+        "book_idx": 0,
+        "nll": 7955.0533447265625,
+        "tokens": 4095
+      },
+      {
+        "chunk_idx": 6,
+        "book_idx": 0,
+        "nll": 7603.1534423828125,
+        "tokens": 4095
+      },
+      {
+        "chunk_idx": 7,
+        "book_idx": 0,
+        "nll": 8428.343811035156,
+        "tokens": 4095
+      },
+      {
+        "chunk_idx": 8,
+        "book_idx": 0,
+        "nll": 8375.873901367188,
+        "tokens": 4095
+      },
+      {
+        "chunk_idx": 9,
+        "book_idx": 0,
+        "nll": 7467.2591552734375,
+        "tokens": 4095
+      },
+      {
+        "chunk_idx": 10,
+        "book_idx": 0,
+        "nll": 8665.499694824219,
+        "tokens": 4095
+      },
+      {
+        "chunk_idx": 11,
+        "book_idx": 0,
+        "nll": 8190.7640380859375,
+        "tokens": 4095
+      },
+      {
+        "chunk_idx": 12,
+        "book_idx": 0,
+        "nll": 7717.996398925781,
+        "tokens": 4095
+      },
+      {
+        "chunk_idx": 13,
+        "book_idx": 1,
+        "nll": 11914.03466796875,
+        "tokens": 4095
+      },
+      {
+        "chunk_idx": 14,
+        "book_idx": 1,
+        "nll": 11854.7373046875,
+        "tokens": 4095
+      },
+      {
+        "chunk_idx": 15,
+        "book_idx": 1,
+        "nll": 12346.333862304688,
+        "tokens": 4095
+      },
+      {
+        "chunk_idx": 16,
+        "book_idx": 1,
+        "nll": 11937.955932617188,
+        "tokens": 4095
+      },
+      {
+        "chunk_idx": 17,
+        "book_idx": 1,
+        "nll": 11910.04052734375,
+        "tokens": 4095
+      },
+      {
+        "chunk_idx": 18,
+        "book_idx": 1,
+        "nll": 12337.226684570312,
+        "tokens": 4095
+      },
+      {
+        "chunk_idx": 19,
+        "book_idx": 1,
+        "nll": 12035.031127929688,
+        "tokens": 4095
+      }
+    ],
+    "bpt_stats": {
+      "n_chunks": 20,
+      "bpt_mean": 3.3134789558770956,
+      "bpt_std": 0.7097258326452816,
+      "bpt_se": 0.1586995207182489,
+      "bpt_ci_lo": 3.0206062453536306,
+      "bpt_ci_hi": 3.626208153477533,
+      "bpt_gaussian_lo": 3.002427895269328,
+      "bpt_gaussian_hi": 3.6245300164848633
+    }
+  },
+  "certified": {
+    "perplexity": 9.950065295950944,
+    "total_nll": 188125.77781797337,
+    "total_tokens": 81880,
+    "skip_rate": 0.4056167277831238,
+    "skipped_blocks": 3272837138,
+    "total_blocks": 8068792320,
+    "decode_steps": 40940,
+    "per_chunk": [
+      {
+        "chunk_idx": 0,
+        "book_idx": 0,
+        "prefix_nll": 3695.7689819335938,
+        "prefix_tokens": 2047,
+        "suffix_nll": 3832.1902648471687,
+        "suffix_tokens": 2047,
+        "nll": 7527.959246780762,
+        "tokens": 4094,
+        "skipped_blocks": 156771194,
+        "total_blocks": 403439616
+      },
+      {
+        "chunk_idx": 1,
+        "book_idx": 0,
+        "prefix_nll": 4022.43408203125,
+        "prefix_tokens": 2047,
+        "suffix_nll": 4011.5120970489656,
+        "suffix_tokens": 2047,
+        "nll": 8033.946179080216,
+        "tokens": 4094,
+        "skipped_blocks": 168950742,
+        "total_blocks": 403439616
+      },
+      {
+        "chunk_idx": 2,
+        "book_idx": 0,
+        "prefix_nll": 4093.878173828125,
+        "prefix_tokens": 2047,
+        "suffix_nll": 4021.430168925557,
+        "suffix_tokens": 2047,
+        "nll": 8115.308342753682,
+        "tokens": 4094,
+        "skipped_blocks": 173376999,
+        "total_blocks": 403439616
+      },
+      {
+        "chunk_idx": 3,
+        "book_idx": 0,
+        "prefix_nll": 3878.7164306640625,
+        "prefix_tokens": 2047,
+        "suffix_nll": 3912.6223237203703,
+        "suffix_tokens": 2047,
+        "nll": 7791.338754384433,
+        "tokens": 4094,
+        "skipped_blocks": 163764569,
+        "total_blocks": 403439616
+      },
+      {
+        "chunk_idx": 4,
+        "book_idx": 0,
+        "prefix_nll": 3900.6182861328125,
+        "prefix_tokens": 2047,
+        "suffix_nll": 4001.04930317428,
+        "suffix_tokens": 2047,
+        "nll": 7901.667589307092,
+        "tokens": 4094,
+        "skipped_blocks": 167349261,
+        "total_blocks": 403439616
+      },
+      {
+        "chunk_idx": 5,
+        "book_idx": 0,
+        "prefix_nll": 4165.123779296875,
+        "prefix_tokens": 2047,
+        "suffix_nll": 3785.7881843867553,
+        "suffix_tokens": 2047,
+        "nll": 7950.91196368363,
+        "tokens": 4094,
+        "skipped_blocks": 170413680,
+        "total_blocks": 403439616
+      },
+      {
+        "chunk_idx": 6,
+        "book_idx": 0,
+        "prefix_nll": 3840.9301147460938,
+        "prefix_tokens": 2047,
+        "suffix_nll": 3757.474184307158,
+        "suffix_tokens": 2047,
+        "nll": 7598.404299053252,
+        "tokens": 4094,
+        "skipped_blocks": 158955003,
+        "total_blocks": 403439616
+      },
+      {
+        "chunk_idx": 7,
+        "book_idx": 0,
+        "prefix_nll": 4255.7276611328125,
+        "prefix_tokens": 2047,
+        "suffix_nll": 4172.499031769948,
+        "suffix_tokens": 2047,
+        "nll": 8428.226692902761,
+        "tokens": 4094,
+        "skipped_blocks": 172138171,
+        "total_blocks": 403439616
+      },
+      {
+        "chunk_idx": 8,
+        "book_idx": 0,
+        "prefix_nll": 4243.8843994140625,
+        "prefix_tokens": 2047,
+        "suffix_nll": 4127.746284534818,
+        "suffix_tokens": 2047,
+        "nll": 8371.63068394888,
+        "tokens": 4094,
+        "skipped_blocks": 175190407,
+        "total_blocks": 403439616
+      },
+      {
+        "chunk_idx": 9,
+        "book_idx": 0,
+        "prefix_nll": 3756.6342163085938,
+        "prefix_tokens": 2047,
+        "suffix_nll": 3712.966063779386,
+        "suffix_tokens": 2047,
+        "nll": 7469.60028008798,
+        "tokens": 4094,
+        "skipped_blocks": 170318218,
+        "total_blocks": 403439616
+      },
+      {
+        "chunk_idx": 10,
+        "book_idx": 0,
+        "prefix_nll": 4570.2554931640625,
+        "prefix_tokens": 2047,
+        "suffix_nll": 4101.971589604424,
+        "suffix_tokens": 2047,
+        "nll": 8672.227082768486,
+        "tokens": 4094,
+        "skipped_blocks": 179134135,
+        "total_blocks": 403439616
+      },
+      {
+        "chunk_idx": 11,
+        "book_idx": 0,
+        "prefix_nll": 4026.6344604492188,
+        "prefix_tokens": 2047,
+        "suffix_nll": 4165.773177591938,
+        "suffix_tokens": 2047,
+        "nll": 8192.407638041157,
+        "tokens": 4094,
+        "skipped_blocks": 165924748,
+        "total_blocks": 403439616
+      },
+      {
+        "chunk_idx": 12,
+        "book_idx": 0,
+        "prefix_nll": 4166.0631103515625,
+        "prefix_tokens": 2047,
+        "suffix_nll": 3557.015404582711,
+        "suffix_tokens": 2047,
+        "nll": 7723.078514934274,
+        "tokens": 4094,
+        "skipped_blocks": 170429672,
+        "total_blocks": 403439616
+      },
+      {
+        "chunk_idx": 13,
+        "book_idx": 1,
+        "prefix_nll": 6271.3245849609375,
+        "prefix_tokens": 2047,
+        "suffix_nll": 5655.599375728743,
+        "suffix_tokens": 2047,
+        "nll": 11926.92396068968,
+        "tokens": 4094,
+        "skipped_blocks": 156717844,
+        "total_blocks": 403439616
+      },
+      {
+        "chunk_idx": 14,
+        "book_idx": 1,
+        "prefix_nll": 6166.072021484375,
+        "prefix_tokens": 2047,
+        "suffix_nll": 5685.150362151431,
+        "suffix_tokens": 2047,
+        "nll": 11851.222383635806,
+        "tokens": 4094,
+        "skipped_blocks": 157130254,
+        "total_blocks": 403439616
+      },
+      {
+        "chunk_idx": 15,
+        "book_idx": 1,
+        "prefix_nll": 6268.03125,
+        "prefix_tokens": 2047,
+        "suffix_nll": 6084.280917163893,
+        "suffix_tokens": 2047,
+        "nll": 12352.312167163893,
+        "tokens": 4094,
+        "skipped_blocks": 149355254,
+        "total_blocks": 403439616
+      },
+      {
+        "chunk_idx": 16,
+        "book_idx": 1,
+        "prefix_nll": 6024.2186279296875,
+        "prefix_tokens": 2047,
+        "suffix_nll": 5926.853611951639,
+        "suffix_tokens": 2047,
+        "nll": 11951.072239881327,
+        "tokens": 4094,
+        "skipped_blocks": 156526930,
+        "total_blocks": 403439616
+      },
+      {
+        "chunk_idx": 17,
+        "book_idx": 1,
+        "prefix_nll": 5843.413330078125,
+        "prefix_tokens": 2047,
+        "suffix_nll": 6071.794022886072,
+        "suffix_tokens": 2047,
+        "nll": 11915.207352964197,
+        "tokens": 4094,
+        "skipped_blocks": 156200418,
+        "total_blocks": 403439616
+      },
+      {
+        "chunk_idx": 18,
+        "book_idx": 1,
+        "prefix_nll": 6507.1676025390625,
+        "prefix_tokens": 2047,
+        "suffix_nll": 5817.034584204931,
+        "suffix_tokens": 2047,
+        "nll": 12324.202186743994,
+        "tokens": 4094,
+        "skipped_blocks": 155306746,
+        "total_blocks": 403439616
+      },
+      {
+        "chunk_idx": 19,
+        "book_idx": 1,
+        "prefix_nll": 6259.1419677734375,
+        "prefix_tokens": 2047,
+        "suffix_nll": 5768.988291394433,
+        "suffix_tokens": 2047,
+        "nll": 12028.13025916787,
+        "tokens": 4094,
+        "skipped_blocks": 148882893,
+        "total_blocks": 403439616
+      }
+    ],
+    "bpt_stats": {
+      "n_chunks": 20,
+      "bpt_mean": 3.314705993177445,
+      "bpt_std": 0.7100018143060242,
+      "bpt_se": 0.15876123209364526,
+      "bpt_ci_lo": 3.0217281209347955,
+      "bpt_ci_hi": 3.628058386498006,
+      "bpt_gaussian_lo": 3.0035339782739006,
+      "bpt_gaussian_hi": 3.62587800808099
+    },
+    "bpt_stats_suffix": {
+      "n_chunks": 20,
+      "bpt_mean": 3.2479928120907102,
+      "bpt_std": 0.6756103702662245,
+      "bpt_se": 0.15107107142190807,
+      "bpt_ci_lo": 2.970065995029341,
+      "bpt_ci_hi": 3.545029388445196,
+      "bpt_gaussian_lo": 2.9518935121037706,
+      "bpt_gaussian_hi": 3.54409211207765
+    }
+  },
+  "ratio": 1.0008508792377038,
+  "delta": 0.008459106296204055
+}

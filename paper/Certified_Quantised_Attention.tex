@@ -1,0 +1,112 @@
+\documentclass[11pt,a4paper]{article}
+
+% ---- Packages ----
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{palatino}
+\usepackage{mathpazo}
+\usepackage{microtype}
+\usepackage{geometry}
+\geometry{margin=1in, headheight=14pt}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\hypersetup{
+  hidelinks,
+  pdftitle={Certified Quantised Attention with Runtime Precision Escalation},
+  pdfauthor={Dean Calver},
+  pdfsubject={KV cache quantisation with formal error bounds and FP16 fallback},
+  pdfkeywords={KV cache, quantisation, attention, LLM inference, error bounds}
+}
+\usepackage{fancyhdr}
+\usepackage[table]{xcolor}
+\usepackage{parskip}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,backgrounds,calc}
+
+% ---- Page style ----
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textit{\small Certified Quantised Attention with Runtime Precision Escalation}}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ---- Theorem environments ----
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{lemma}[theorem]{Lemma}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% ---- Spacing ----
+\setlength{\parskip}{6pt}
+\setlength{\parindent}{0pt}
+\titlespacing*{\section}{0pt}{18pt}{8pt}
+\titlespacing*{\subsection}{0pt}{12pt}{4pt}
+
+% ---- Notation ----
+\newcommand{\Kb}{\mathbf{K}}
+\newcommand{\Qb}{\mathbf{Q}}
+\newcommand{\Vb}{\mathbf{V}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\norm}[1]{\lVert #1 \rVert}
+% breakable long identifier
+\newcommand{\torchsdpa}{\texttt{torch.scaled\_dot\_\hspace{0pt}product\_attention}}
+
+% =============================================================
+\begin{document}
+
+% ---- Title ----
+\begin{center}
+  {\LARGE\bfseries Certified Quantised Attention}\\[4pt]
+  {\LARGE\bfseries with Runtime Precision Escalation}\\[10pt]
+  {\large\itshape Provable Error Bounds for Compressed KV Caches with Unconditional FP16 Fallback}\\[8pt]
+  Dean Calver\\[4pt]
+  {\small\color{gray} April 2026}
+\end{center}
+
+\hrule
+\vspace{10pt}
+
+% ---- Abstract ----
+\begin{abstract}
+KV cache quantisation reduces the memory cost of long-context LLM inference, but introduces an approximation error whose magnitude is difficult to characterise in advance.  Existing systems treat this as an acceptable tradeoff: compress aggressively, hope the model is robust.
+
+We present a tiered KV cache that stores INT8 keys and INT4 values in GPU memory while retaining FP16 originals in system RAM\@.  A two-term error decomposition provides independent, per-head, per-step bounds on key and value compression error.  At runtime, the system monitors these bounds and adaptively selects precision per block: blocks with acceptably small error execute on compressed data; blocks that exceed the bound have their FP16 originals paged in.  The worst case is not silent quality degradation---it is the Dense baseline's own \torchsdpa{} code path with unmodified FP16 KV\@.
+
+On LLaMA~3.1-8B across 4K--32K contexts, the certified system matches dense perplexity within noise on PG-19 and is statistically indistinguishable from dense on NIAH (100 paired trials, 8K).  The system runs at ${\sim}2.2\times$ dense latency; effective VRAM savings require 128K+ context due to GQA working-set saturation at shorter lengths.  No model retraining or dataset-specific calibration is required.
+\end{abstract}
+
+\vspace{8pt}
+\hrule
+\vspace{10pt}
+
+\tableofcontents
+
+\newpage
+
+% NOTE: Full paper body supplied by the user in chat should be restored here.
+% This placeholder keeps the repository scaffold valid while the extraction work
+% below identifies the minimal code and result files that back the paper.
+
+\section{Introduction}
+\label{sec:intro}
+
+Autoregressive LLM decoding at long context lengths is dominated by the cost of reading the key-value (KV) cache from GPU memory.  Each decode step fetches cached keys and values for every attention head, a cost linear in sequence length.  At 128K context on a model with 32 attention heads and head dimension 128, the KV cache alone occupies several gigabytes and consumes the majority of available memory bandwidth during decode.
+
+KV cache quantisation addresses this by storing keys and values in reduced-precision formats---typically INT8, INT4, or lower.  The savings are substantial: an INT8 cache halves memory usage, and INT4 quarters it.  But quantisation introduces error, and the relationship between quantisation parameters and output quality is complex.
+
+This paper provides that guarantee through tiered storage with unconditional fallback, formal error bounds with runtime monitoring, and adaptive per-block precision selection.
+
+\section{Results}
+\label{sec:results}
+
+The full results tables from the supplied paper should be restored here when the paper is normalised from the chat transcript.
+
+\end{document}

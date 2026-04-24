@@ -1,0 +1,82 @@
+{
+  "benchmark": "niah",
+  "context_length": 8192,
+  "config": "certified",
+  "smoke": false,
+  "quality": {
+    "metric": "accuracy",
+    "value": 0.8666666666666667,
+    "dense_value": 0.9333333333333333,
+    "delta": -0.06666666666666665,
+    "critical_failures": 3
+  },
+  "system": {
+    "ranking_disagree_rate_r1": 0.0011511435055865922,
+    "ranking_disagree_rate_r3": 0.025484150538707104,
+    "ranking_fallback_rate": 0.0011511435055865922,
+    "heads_total": 1283072
+  },
+  "native": {
+    "heatmaps": {
+      "dense": {
+        "8K_d0.0": 0.6666666666666666,
+        "8K_d0.1": 0.6666666666666666,
+        "8K_d0.2": 1.0,
+        "8K_d0.3": 1.0,
+        "8K_d0.4": 1.0,
+        "8K_d0.5": 1.0,
+        "8K_d0.6": 1.0,
+        "8K_d0.7": 1.0,
+        "8K_d0.8": 1.0,
+        "8K_d0.9": 1.0
+      },
+      "certified": {
+        "8K_d0.0": 0.6666666666666666,
+        "8K_d0.1": 1.0,
+        "8K_d0.2": 1.0,
+        "8K_d0.3": 1.0,
+        "8K_d0.4": 0.6666666666666666,
+        "8K_d0.5": 0.6666666666666666,
+        "8K_d0.6": 0.6666666666666666,
+        "8K_d0.7": 1.0,
+        "8K_d0.8": 1.0,
+        "8K_d0.9": 1.0
+      }
+    },
+    "dense_accuracy": 0.9333333333333333,
+    "certified_accuracy": 0.8666666666666667,
+    "critical_failures": 3,
+    "ranking_fallback_summary": {
+      "mode": "full",
+      "r": 1,
+      "heads_total": 1283072,
+      "disagree_r1": 1477,
+      "disagree_r3": 32698,
+      "triggered": 1477,
+      "disagree_rate_r1": 0.0011511435055865922,
+      "disagree_rate_r3": 0.025484150538707104,
+      "fallback_rate": 0.0011511435055865922
+    }
+  },
+  "meta": {
+    "model": "NousResearch/Meta-Llama-3.1-8B",
+    "model_quant": "int8-bitsandbytes",
+    "hardware": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition sm_120",
+    "timestamp": "2026-04-21T06:20:12.923272+00:00",
+    "started": "2026-04-21T06:14:21.948203+00:00",
+    "wall_seconds": 350.9750690497458,
+    "git_sha": "d028ff30",
+    "exit_code": 0,
+    "params": {
+      "v_tol": "0.05",
+      "tau_cov": "0.995",
+      "k_min": "2",
+      "k_max": "128",
+      "ranking_r": "1",
+      "eps_guard": "0.01",
+      "exploration_rate": "0.02",
+      "rung1_threshold": "0.02",
+      "rung1_multiplier": "2.0"
+    }
+  }
+}

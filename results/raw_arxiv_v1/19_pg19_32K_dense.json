@@ -1,0 +1,38 @@
+{
+  "benchmark": "pg19",
+  "context_length": 32768,
+  "config": "dense",
+  "smoke": false,
+  "quality": {
+    "metric": "perplexity",
+    "value": 11.04812015351047
+  },
+  "system": {},
+  "native": {
+    "benchmark": "pg19_perplexity",
+    "model": "NousResearch/Meta-Llama-3.1-8B",
+    "context_length": 32768,
+    "num_chunks": 5,
+    "eval_start_frac": 0.5,
+    "concentration_threshold": 0.0,
+    "default_epsilon_override": null,
+    "top_k_override": null,
+    "dense": {
+      "perplexity": 11.04812015351047,
+      "total_nll": 393574.3148803711,
+      "total_tokens": 163835
+    },
+    "certified": null
+  },
+  "meta": {
+    "model": "NousResearch/Meta-Llama-3.1-8B",
+    "model_quant": "int8-bitsandbytes",
+    "hardware": "NVIDIA RTX PRO 6000 Blackwell Server Edition sm_120",
+    "timestamp": "2026-04-21T14:13:33.937038+00:00",
+    "started": "2026-04-21T14:12:10.256803+00:00",
+    "wall_seconds": 83.68023231904954,
+    "git_sha": "33b668f0",
+    "exit_code": 0,
+    "params": {}
+  }
+}

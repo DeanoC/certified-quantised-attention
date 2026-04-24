@@ -1,0 +1,7 @@
+numpy
+torch
+triton
+tqdm
+transformers
+datasets
+bitsandbytes

@@ -1,0 +1,82 @@
+{
+  "benchmark": "niah",
+  "context_length": 4096,
+  "config": "certified",
+  "smoke": false,
+  "quality": {
+    "metric": "accuracy",
+    "value": 0.7666666666666667,
+    "dense_value": 0.8333333333333334,
+    "delta": -0.06666666666666665,
+    "critical_failures": 3
+  },
+  "system": {
+    "ranking_disagree_rate_r1": 0.0012712873827208757,
+    "ranking_disagree_rate_r3": 0.025709019497654417,
+    "ranking_fallback_rate": 0.0012712873827208757,
+    "heads_total": 1309696
+  },
+  "native": {
+    "heatmaps": {
+      "dense": {
+        "4K_d0.0": 1.0,
+        "4K_d0.1": 0.6666666666666666,
+        "4K_d0.2": 0.6666666666666666,
+        "4K_d0.3": 0.6666666666666666,
+        "4K_d0.4": 1.0,
+        "4K_d0.5": 0.6666666666666666,
+        "4K_d0.6": 0.6666666666666666,
+        "4K_d0.7": 1.0,
+        "4K_d0.8": 1.0,
+        "4K_d0.9": 1.0
+      },
+      "certified": {
+        "4K_d0.0": 1.0,
+        "4K_d0.1": 0.6666666666666666,
+        "4K_d0.2": 0.6666666666666666,
+        "4K_d0.3": 0.6666666666666666,
+        "4K_d0.4": 0.6666666666666666,
+        "4K_d0.5": 0.6666666666666666,
+        "4K_d0.6": 0.6666666666666666,
+        "4K_d0.7": 1.0,
+        "4K_d0.8": 0.6666666666666666,
+        "4K_d0.9": 1.0
+      }
+    },
+    "dense_accuracy": 0.8333333333333334,
+    "certified_accuracy": 0.7666666666666667,
+    "critical_failures": 3,
+    "ranking_fallback_summary": {
+      "mode": "full",
+      "r": 1,
+      "heads_total": 1309696,
+      "disagree_r1": 1665,
+      "disagree_r3": 33671,
+      "triggered": 1665,
+      "disagree_rate_r1": 0.0012712873827208757,
+      "disagree_rate_r3": 0.025709019497654417,
+      "fallback_rate": 0.0012712873827208757
+    }
+  },
+  "meta": {
+    "model": "NousResearch/Meta-Llama-3.1-8B",
+    "model_quant": "int8-bitsandbytes",
+    "hardware": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition sm_120",
+    "timestamp": "2026-04-21T04:25:44.149130+00:00",
+    "started": "2026-04-21T04:20:38.753695+00:00",
+    "wall_seconds": 305.3954346179962,
+    "git_sha": "c86276cf",
+    "exit_code": 0,
+    "params": {
+      "v_tol": "0.05",
+      "tau_cov": "0.995",
+      "k_min": "2",
+      "k_max": "128",
+      "ranking_r": "1",
+      "eps_guard": "0.01",
+      "exploration_rate": "0.02",
+      "rung1_threshold": "0.02",
+      "rung1_multiplier": "2.0"
+    }
+  }
+}
