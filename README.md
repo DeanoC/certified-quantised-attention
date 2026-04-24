@@ -2,8 +2,8 @@
 
 Minimal review repository for the paper `Certified_Quantised_Attention.tex`.
 
-This repository is being extracted from the experimental `DotCache` workspace. The
-goal is to keep only the paper, implementation code, benchmark drivers, and JSON
+This repository is being extracted from the experimental [`DotCache`](https://github.com/DeanoC/DotCache) research repo . 
+This repo has only the paper, implementation code, benchmark drivers, and JSON
 results required for reviewers to inspect and reproduce the reported claims.
 
 ## Layout
@@ -64,9 +64,3 @@ path and are intentionally kept visible:
 - `src/llama_integration.py`
 - `src/config.py`
 - `src/calibrated_profile.py`
-
-Known remaining work:
-
-- Restore the full paper body into `paper/Certified_Quantised_Attention.tex`.
-- Add a small smoke test that validates quantise/dequantise and selector logic
-  without requiring a full LLaMA model.
