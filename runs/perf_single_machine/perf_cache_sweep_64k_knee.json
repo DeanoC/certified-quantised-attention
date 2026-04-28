@@ -1,0 +1,113 @@
+{
+  "machine": "perf",
+  "benchmark": "performance",
+  "sub_benchmark": "cache_sweep_64k_knee",
+  "timestamp": "2026-04-27T11:54:31.637104+00:00",
+  "config": {
+    "k_max": 128,
+    "tau_cov": 0.995,
+    "group_size": 16,
+    "v_tol": 0.05,
+    "use_int4_values": true,
+    "use_asymmetric_keys": true,
+    "fp64_accumulators": true,
+    "block_size": 16,
+    "score_consistency_check": false,
+    "attention_backend": "native_blackwell"
+  },
+  "model": "NousResearch/Meta-Llama-3.1-8B",
+  "hardware": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition",
+  "results": [
+    {
+      "capacity_blocks": 1024,
+      "fp16_key_cache_blocks": 1024,
+      "fp16_value_cache_blocks": 1024,
+      "cert_ms_mean": 824.4439706802368,
+      "cert_ms_std": 172.181939935847,
+      "cache_hit_rate": 0.21275233663086843,
+      "value_cache_hit_rate": null,
+      "h2d_bytes_per_step": 1208563280.0,
+      "int8_tail_fraction": 0.875220013600023,
+      "k_star_mean": 218.2651841905382,
+      "raw": "runs/perf_single_machine/raw/cache_sweep_64k/context_65536_cap_1024.json"
+    },
+    {
+      "capacity_blocks": 1280,
+      "fp16_key_cache_blocks": 1280,
+      "fp16_value_cache_blocks": 1280,
+      "cert_ms_mean": 361.35366702079773,
+      "cert_ms_std": 180.273328351336,
+      "cache_hit_rate": 0.7810595224599176,
+      "value_cache_hit_rate": null,
+      "h2d_bytes_per_step": 489942016.0,
+      "int8_tail_fraction": 0.8752308932480732,
+      "k_star_mean": 218.25010342068143,
+      "raw": "runs/perf_single_machine/raw/cache_sweep_64k_knee/context_65536_cap_1280.json"
+    },
+    {
+      "capacity_blocks": 1536,
+      "fp16_key_cache_blocks": 1536,
+      "fp16_value_cache_blocks": 1536,
+      "cert_ms_mean": 261.84803009033203,
+      "cert_ms_std": 30.251550171486144,
+      "cache_hit_rate": 0.9341948416442767,
+      "value_cache_hit_rate": null,
+      "h2d_bytes_per_step": 294672968.0,
+      "int8_tail_fraction": 0.8752250069947208,
+      "k_star_mean": 218.22734578450522,
+      "raw": "runs/perf_single_machine/raw/cache_sweep_64k_knee/context_65536_cap_1536.json"
+    },
+    {
+      "capacity_blocks": 1664,
+      "fp16_key_cache_blocks": 1664,
+      "fp16_value_cache_blocks": 1664,
+      "cert_ms_mean": 261.3148567676544,
+      "cert_ms_std": 32.32335059854244,
+      "cache_hit_rate": 0.9550817255010415,
+      "value_cache_hit_rate": null,
+      "h2d_bytes_per_step": 263198664.0,
+      "int8_tail_fraction": 0.8752377517252939,
+      "k_star_mean": 218.25309075249567,
+      "raw": "runs/perf_single_machine/raw/cache_sweep_64k_knee/context_65536_cap_1664.json"
+    },
+    {
+      "capacity_blocks": 1792,
+      "fp16_key_cache_blocks": 1792,
+      "fp16_value_cache_blocks": 1792,
+      "cert_ms_mean": 260.4233639240265,
+      "cert_ms_std": 29.754150254751057,
+      "cache_hit_rate": 0.9671055036382297,
+      "value_cache_hit_rate": null,
+      "h2d_bytes_per_step": 245397872.0,
+      "int8_tail_fraction": 0.8751988627705614,
+      "k_star_mean": 218.25474378797742,
+      "raw": "runs/perf_single_machine/raw/cache_sweep_64k_knee/context_65536_cap_1792.json"
+    },
+    {
+      "capacity_blocks": 1920,
+      "fp16_key_cache_blocks": 1920,
+      "fp16_value_cache_blocks": 1920,
+      "cert_ms_mean": 258.43371772766113,
+      "cert_ms_std": 29.122761087150234,
+      "cache_hit_rate": 0.9732468603224314,
+      "value_cache_hit_rate": null,
+      "h2d_bytes_per_step": 242209480.0,
+      "int8_tail_fraction": 0.8751820968691587,
+      "k_star_mean": 218.32974243164062,
+      "raw": "runs/perf_single_machine/raw/cache_sweep_64k_knee/context_65536_cap_1920.json"
+    },
+    {
+      "capacity_blocks": 2048,
+      "fp16_key_cache_blocks": 2048,
+      "fp16_value_cache_blocks": 2048,
+      "cert_ms_mean": 259.19551610946655,
+      "cert_ms_std": 29.262676048130768,
+      "cache_hit_rate": 0.9749593728436278,
+      "value_cache_hit_rate": null,
+      "h2d_bytes_per_step": 238511688.0,
+      "int8_tail_fraction": 0.875160139160024,
+      "k_star_mean": 218.37345038519965,
+      "raw": "runs/perf_single_machine/raw/cache_sweep_64k/context_65536_cap_2048.json"
+    }
+  ]
+}

@@ -1,0 +1,208 @@
+{
+  "results": {
+    "dense": [
+      {
+        "context_tokens": 65356,
+        "target_context": 65536,
+        "depth": 0.0,
+        "needle_idx": 5,
+        "mode": "dense",
+        "correct": true,
+        "expected": "Viper-Seven",
+        "generated": " The secret, code, location, budget, or ID mentioned in the special statement is: Viper-Seven.\n",
+        "trial_idx": 5
+      }
+    ],
+    "certified": [
+      {
+        "context_tokens": 65356,
+        "target_context": 65536,
+        "depth": 0.0,
+        "needle_idx": 5,
+        "mode": "certified",
+        "correct": true,
+        "expected": "Viper-Seven",
+        "generated": " The secret, code, location, budget, or ID mentioned in the special statement is: Viper-Seven\n",
+        "ranking_heads_total": 50176,
+        "ranking_disagree_r1": 87,
+        "ranking_disagree_r3": 584,
+        "ranking_fallback_triggered": 622,
+        "rung1_fired": true,
+        "rung2_fired": true,
+        "rung3_fired": true,
+        "rung4_fired": false,
+        "rung1_fired_layers": 1365,
+        "rung2_fired_layers": 1568,
+        "rung3_fired_layers": 137,
+        "rung4_fired_layers": 0,
+        "boundary_check_fired": true,
+        "boundary_check_fired_layers": 69,
+        "boundary_check_triggered_heads_total": 540,
+        "e_key_step_mean": 0.1722018438681238,
+        "e_key_step_max": 8.655444145202637,
+        "v_max_global": 24.344234466552734,
+        "e_val_max": 0.04999999701976776,
+        "e_val_mean": 0.022840357772092458,
+        "e_val_pre_rung2_max": 0.10280870646238327,
+        "e_val_pre_rung2_mean": 0.07584070591541121,
+        "value_fallback_blocks": 172641,
+        "value_fallback_head_blocks": 1090947,
+        "tail_mass_int8_est_step_mean": 0.0522100753946781,
+        "tail_mass_int8_est_step_max": 0.919362485408783,
+        "k_star_mean": 159.75470344387756,
+        "k_star_max": 256,
+        "h2d_key_bytes": 0,
+        "h2d_value_bytes": 0,
+        "h2d_total_bytes": 0,
+        "vram_fp16_key_cache_bytes": 209955651584,
+        "vram_fp16_value_cache_bytes": 263066746880,
+        "fp16_value_cache_hits_step": 0,
+        "fp16_value_cache_misses_step": 0,
+        "fp16_value_cache_evictions_step": 0,
+        "fp16_value_cache_needed_blocks_step": 0,
+        "fp16_value_cache_overflow_step": 0,
+        "trial_idx": 5
+      }
+    ]
+  },
+  "heatmaps": {
+    "dense": {
+      "64K_d0.0": 1.0
+    },
+    "certified": {
+      "64K_d0.0": 1.0
+    }
+  },
+  "dense_accuracy": 1.0,
+  "certified_accuracy": 1.0,
+  "critical_failures": 0,
+  "paired_stats": {
+    "n": 1,
+    "dense_correct": 1,
+    "certified_correct": 1,
+    "dense_accuracy": 1.0,
+    "certified_accuracy": 1.0,
+    "delta_accuracy": 0.0,
+    "delta_pp": 0.0,
+    "bootstrap_ci_lo": 0.0,
+    "bootstrap_ci_hi": 0.0,
+    "bootstrap_ci_pp_lo": 0.0,
+    "bootstrap_ci_pp_hi": 0.0,
+    "bootstrap_iters": 10000,
+    "bootstrap_seed": 20260425,
+    "mcnemar_p": 1.0,
+    "mcnemar": {
+      "test": "exact_two_sided_binomial",
+      "p_value": 1.0,
+      "discordant": 0,
+      "dense_only": 0,
+      "certified_only": 0
+    },
+    "paired_table": {
+      "both_correct": 1,
+      "dense_only": 0,
+      "certified_only": 0,
+      "both_wrong": 0
+    }
+  },
+  "paired_stats_by_context": {
+    "64K": {
+      "n": 1,
+      "dense_correct": 1,
+      "certified_correct": 1,
+      "dense_accuracy": 1.0,
+      "certified_accuracy": 1.0,
+      "delta_accuracy": 0.0,
+      "delta_pp": 0.0,
+      "bootstrap_ci_lo": 0.0,
+      "bootstrap_ci_hi": 0.0,
+      "bootstrap_ci_pp_lo": 0.0,
+      "bootstrap_ci_pp_hi": 0.0,
+      "bootstrap_iters": 10000,
+      "bootstrap_seed": 20260425,
+      "mcnemar_p": 1.0,
+      "mcnemar": {
+        "test": "exact_two_sided_binomial",
+        "p_value": 1.0,
+        "discordant": 0,
+        "dense_only": 0,
+        "certified_only": 0
+      },
+      "paired_table": {
+        "both_correct": 1,
+        "dense_only": 0,
+        "certified_only": 0,
+        "both_wrong": 0
+      }
+    }
+  },
+  "paired_stats_by_needle_group": {
+    "harder": {
+      "n": 1,
+      "dense_correct": 1,
+      "certified_correct": 1,
+      "dense_accuracy": 1.0,
+      "certified_accuracy": 1.0,
+      "delta_accuracy": 0.0,
+      "delta_pp": 0.0,
+      "bootstrap_ci_lo": 0.0,
+      "bootstrap_ci_hi": 0.0,
+      "bootstrap_ci_pp_lo": 0.0,
+      "bootstrap_ci_pp_hi": 0.0,
+      "bootstrap_iters": 10000,
+      "bootstrap_seed": 20260426,
+      "mcnemar_p": 1.0,
+      "mcnemar": {
+        "test": "exact_two_sided_binomial",
+        "p_value": 1.0,
+        "discordant": 0,
+        "dense_only": 0,
+        "certified_only": 0
+      },
+      "paired_table": {
+        "both_correct": 1,
+        "dense_only": 0,
+        "certified_only": 0,
+        "both_wrong": 0
+      }
+    }
+  },
+  "cache_config": {
+    "v_tolerance": 0.05,
+    "quantization_mode": "asymmetric_int8_keys+int4_g16_values",
+    "asymmetric_keys": true,
+    "use_int4_values": true,
+    "group_size": 16,
+    "score_consistency_check": false,
+    "tau_cov": 0.995,
+    "k_min": 2,
+    "k_max": 128,
+    "ranking_fallback": true,
+    "ranking_r": 1,
+    "ranking_fallback_mode": "full",
+    "fp16_key_cache_blocks": 5120,
+    "fp16_value_cache_blocks": 5120,
+    "eps_guard": 0.01,
+    "exploration_rate": 0.02,
+    "rung1_threshold": 0.02,
+    "rung1_multiplier": 2.0,
+    "attention_backend": "native_blackwell",
+    "static_resident_cache": "1",
+    "splitk_blocks_per_split": "auto_native_32_24_16",
+    "cuda_graph_decode": false,
+    "runtime_profile": "0",
+    "code_sha": "1b6efef412534ef9f2be79857611da1efb3109b4-dirty",
+    "dotcache_config_hash": "d96369a4a560179881df273983ca405a28f4a4d4503697d60392bd8ca71e6a9a"
+  },
+  "ranking_fallback_summary": {
+    "mode": "full",
+    "r": 1,
+    "heads_total": 50176,
+    "disagree_r1": 87,
+    "disagree_r3": 584,
+    "triggered": 622,
+    "disagree_rate_r1": 0.0017338966836734694,
+    "disagree_rate_r3": 0.011639030612244899,
+    "fallback_rate": 0.012396364795918368
+  }
+}

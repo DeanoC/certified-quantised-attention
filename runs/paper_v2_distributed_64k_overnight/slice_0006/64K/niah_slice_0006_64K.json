@@ -1,0 +1,208 @@
+{
+  "results": {
+    "dense": [
+      {
+        "context_tokens": 65355,
+        "target_context": 65536,
+        "depth": 0.0,
+        "needle_idx": 6,
+        "mode": "dense",
+        "correct": true,
+        "expected": "Hotel-Echo-4",
+        "generated": " The secret, code, location, budget, or ID mentioned in the special statement is: Hotel-Echo-4\n",
+        "trial_idx": 6
+      }
+    ],
+    "certified": [
+      {
+        "context_tokens": 65355,
+        "target_context": 65536,
+        "depth": 0.0,
+        "needle_idx": 6,
+        "mode": "certified",
+        "correct": true,
+        "expected": "Hotel-Echo-4",
+        "generated": " The secret, code, location, budget, or ID mentioned in the special statement is: Hotel-Echo-4\n",
+        "ranking_heads_total": 50176,
+        "ranking_disagree_r1": 118,
+        "ranking_disagree_r3": 587,
+        "ranking_fallback_triggered": 613,
+        "rung1_fired": true,
+        "rung2_fired": true,
+        "rung3_fired": true,
+        "rung4_fired": false,
+        "rung1_fired_layers": 1418,
+        "rung2_fired_layers": 1568,
+        "rung3_fired_layers": 170,
+        "rung4_fired_layers": 0,
+        "boundary_check_fired": true,
+        "boundary_check_fired_layers": 73,
+        "boundary_check_triggered_heads_total": 498,
+        "e_key_step_mean": 0.18570034906543714,
+        "e_key_step_max": 6.7299065589904785,
+        "v_max_global": 23.00139808654785,
+        "e_val_max": 0.04999995976686478,
+        "e_val_mean": 0.024416471212598666,
+        "e_val_pre_rung2_max": 0.10536589473485947,
+        "e_val_pre_rung2_mean": 0.07583407435224068,
+        "value_fallback_blocks": 173355,
+        "value_fallback_head_blocks": 1091878,
+        "tail_mass_int8_est_step_mean": 0.055392488156568866,
+        "tail_mass_int8_est_step_max": 0.9192944169044495,
+        "k_star_mean": 169.98182397959184,
+        "k_star_max": 256,
+        "h2d_key_bytes": 0,
+        "h2d_value_bytes": 0,
+        "h2d_total_bytes": 0,
+        "vram_fp16_key_cache_bytes": 209952440320,
+        "vram_fp16_value_cache_bytes": 263066746880,
+        "fp16_value_cache_hits_step": 0,
+        "fp16_value_cache_misses_step": 0,
+        "fp16_value_cache_evictions_step": 0,
+        "fp16_value_cache_needed_blocks_step": 0,
+        "fp16_value_cache_overflow_step": 0,
+        "trial_idx": 6
+      }
+    ]
+  },
+  "heatmaps": {
+    "dense": {
+      "64K_d0.0": 1.0
+    },
+    "certified": {
+      "64K_d0.0": 1.0
+    }
+  },
+  "dense_accuracy": 1.0,
+  "certified_accuracy": 1.0,
+  "critical_failures": 0,
+  "paired_stats": {
+    "n": 1,
+    "dense_correct": 1,
+    "certified_correct": 1,
+    "dense_accuracy": 1.0,
+    "certified_accuracy": 1.0,
+    "delta_accuracy": 0.0,
+    "delta_pp": 0.0,
+    "bootstrap_ci_lo": 0.0,
+    "bootstrap_ci_hi": 0.0,
+    "bootstrap_ci_pp_lo": 0.0,
+    "bootstrap_ci_pp_hi": 0.0,
+    "bootstrap_iters": 10000,
+    "bootstrap_seed": 20260425,
+    "mcnemar_p": 1.0,
+    "mcnemar": {
+      "test": "exact_two_sided_binomial",
+      "p_value": 1.0,
+      "discordant": 0,
+      "dense_only": 0,
+      "certified_only": 0
+    },
+    "paired_table": {
+      "both_correct": 1,
+      "dense_only": 0,
+      "certified_only": 0,
+      "both_wrong": 0
+    }
+  },
+  "paired_stats_by_context": {
+    "64K": {
+      "n": 1,
+      "dense_correct": 1,
+      "certified_correct": 1,
+      "dense_accuracy": 1.0,
+      "certified_accuracy": 1.0,
+      "delta_accuracy": 0.0,
+      "delta_pp": 0.0,
+      "bootstrap_ci_lo": 0.0,
+      "bootstrap_ci_hi": 0.0,
+      "bootstrap_ci_pp_lo": 0.0,
+      "bootstrap_ci_pp_hi": 0.0,
+      "bootstrap_iters": 10000,
+      "bootstrap_seed": 20260425,
+      "mcnemar_p": 1.0,
+      "mcnemar": {
+        "test": "exact_two_sided_binomial",
+        "p_value": 1.0,
+        "discordant": 0,
+        "dense_only": 0,
+        "certified_only": 0
+      },
+      "paired_table": {
+        "both_correct": 1,
+        "dense_only": 0,
+        "certified_only": 0,
+        "both_wrong": 0
+      }
+    }
+  },
+  "paired_stats_by_needle_group": {
+    "harder": {
+      "n": 1,
+      "dense_correct": 1,
+      "certified_correct": 1,
+      "dense_accuracy": 1.0,
+      "certified_accuracy": 1.0,
+      "delta_accuracy": 0.0,
+      "delta_pp": 0.0,
+      "bootstrap_ci_lo": 0.0,
+      "bootstrap_ci_hi": 0.0,
+      "bootstrap_ci_pp_lo": 0.0,
+      "bootstrap_ci_pp_hi": 0.0,
+      "bootstrap_iters": 10000,
+      "bootstrap_seed": 20260426,
+      "mcnemar_p": 1.0,
+      "mcnemar": {
+        "test": "exact_two_sided_binomial",
+        "p_value": 1.0,
+        "discordant": 0,
+        "dense_only": 0,
+        "certified_only": 0
+      },
+      "paired_table": {
+        "both_correct": 1,
+        "dense_only": 0,
+        "certified_only": 0,
+        "both_wrong": 0
+      }
+    }
+  },
+  "cache_config": {
+    "v_tolerance": 0.05,
+    "quantization_mode": "asymmetric_int8_keys+int4_g16_values",
+    "asymmetric_keys": true,
+    "use_int4_values": true,
+    "group_size": 16,
+    "score_consistency_check": false,
+    "tau_cov": 0.995,
+    "k_min": 2,
+    "k_max": 128,
+    "ranking_fallback": true,
+    "ranking_r": 1,
+    "ranking_fallback_mode": "full",
+    "fp16_key_cache_blocks": 5120,
+    "fp16_value_cache_blocks": 5120,
+    "eps_guard": 0.01,
+    "exploration_rate": 0.02,
+    "rung1_threshold": 0.02,
+    "rung1_multiplier": 2.0,
+    "attention_backend": "native_blackwell",
+    "static_resident_cache": "1",
+    "splitk_blocks_per_split": "auto_native_32_24_16",
+    "cuda_graph_decode": false,
+    "runtime_profile": "0",
+    "code_sha": "fdf79ecbf42ff7a2ad583858104fc8e93bfa65ac-dirty",
+    "dotcache_config_hash": "9c08ba50751124f78a5ce3e5748af1024f3001d6d1f69e33916239595cf1fd12"
+  },
+  "ranking_fallback_summary": {
+    "mode": "full",
+    "r": 1,
+    "heads_total": 50176,
+    "disagree_r1": 118,
+    "disagree_r3": 587,
+    "triggered": 613,
+    "disagree_rate_r1": 0.00235172193877551,
+    "disagree_rate_r3": 0.011698820153061224,
+    "fallback_rate": 0.012216996173469387
+  }
+}

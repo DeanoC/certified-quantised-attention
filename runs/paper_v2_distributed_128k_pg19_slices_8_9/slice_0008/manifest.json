@@ -1,0 +1,50 @@
+{
+  "slice_id": 8,
+  "mode": "context",
+  "model": "NousResearch/Meta-Llama-3.1-8B",
+  "cache_mode": "full-bounded",
+  "niah_trials_per_slice": 1,
+  "created": "2026-04-27T14:38:41.215130+00:00",
+  "provenance": {
+    "host": "4667d6a9aff1",
+    "cwd": "/workspace/DotCache",
+    "python": "/workspace/DotCache/.venv/bin/python",
+    "git_commit": "86d543d1b1c07020dfdb8accf9bf2637350c7e11",
+    "git_branch": "port-to-paper-20260424",
+    "git_dirty": true
+  },
+  "jobs": [
+    {
+      "slice_id": 8,
+      "benchmark": "pg19",
+      "context_length": 131072,
+      "output": "runs/paper_v2_distributed_128k_pg19_slices_8_9/slice_0008/128K/pg19_slice_0008_128K.json",
+      "log": "runs/paper_v2_distributed_128k_pg19_slices_8_9/slice_0008/128K/pg19_slice_0008_128K.log",
+      "command_string": "/workspace/DotCache/.venv/bin/python /workspace/DotCache/benchmarks/paper/pg19_perplexity.py --context 131072 --chunk-index 8 --telemetry-mode summary --certified-warmup-steps 128 --output runs/paper_v2_distributed_128k_pg19_slices_8_9/slice_0008/128K/pg19_slice_0008_128K.json --model NousResearch/Meta-Llama-3.1-8B --v-tolerance 0.05 --use-int4-values --group-size 16 --tau-cov 0.995 --k-min 2 --k-max 128 --ranking-fallback --ranking-r 1 --ranking-fallback-mode full --eps-guard 0.01 --exploration-rate 0.02 --rung1-threshold 0.02 --rung1-multiplier 2.0 --fp16-key-cache-blocks 9216 --fp16-value-cache-blocks 9216",
+      "cache_mode": "full-bounded",
+      "recommended_v2_cache_blocks": [
+        7168,
+        3072
+      ]
+    }
+  ],
+  "completed": [
+    {
+      "slice_id": 8,
+      "benchmark": "pg19",
+      "context_length": 131072,
+      "output": "runs/paper_v2_distributed_128k_pg19_slices_8_9/slice_0008/128K/pg19_slice_0008_128K.json",
+      "log": "runs/paper_v2_distributed_128k_pg19_slices_8_9/slice_0008/128K/pg19_slice_0008_128K.log",
+      "command_string": "/workspace/DotCache/.venv/bin/python /workspace/DotCache/benchmarks/paper/pg19_perplexity.py --context 131072 --chunk-index 8 --telemetry-mode summary --certified-warmup-steps 128 --output runs/paper_v2_distributed_128k_pg19_slices_8_9/slice_0008/128K/pg19_slice_0008_128K.json --model NousResearch/Meta-Llama-3.1-8B --v-tolerance 0.05 --use-int4-values --group-size 16 --tau-cov 0.995 --k-min 2 --k-max 128 --ranking-fallback --ranking-r 1 --ranking-fallback-mode full --eps-guard 0.01 --exploration-rate 0.02 --rung1-threshold 0.02 --rung1-multiplier 2.0 --fp16-key-cache-blocks 9216 --fp16-value-cache-blocks 9216",
+      "cache_mode": "full-bounded",
+      "recommended_v2_cache_blocks": [
+        7168,
+        3072
+      ],
+      "started": "2026-04-27T14:38:41.340742+00:00",
+      "ended": "2026-04-27T19:04:20.157212+00:00",
+      "wall_seconds": 15938.816424964927,
+      "exit_code": 0
+    }
+  ]
+}

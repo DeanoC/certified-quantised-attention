@@ -5,4 +5,7 @@ tqdm
 transformers
 datasets
 bitsandbytes
+accelerate
+sentencepiece
+safetensors
 pytest

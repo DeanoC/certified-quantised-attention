@@ -1,0 +1,62 @@
+{
+  "8192": {
+    "dense_vram_mb": 1073.741824,
+    "cert_tier1_vram_mb": 607.785984,
+    "cert_scratch_vram_mb": 4303.355904,
+    "cert_key_scratch_vram_mb": 2147.483648,
+    "cert_value_scratch_vram_mb": 2147.483648,
+    "cert_pagein_scratch_vram_mb": 8.388608,
+    "cert_total_vram_mb": 4911.141888,
+    "cert_system_ram_mb": 1075.838976,
+    "vram_ratio": 4.573857307434082,
+    "tier1_ratio": 0.566044807434082,
+    "fp16_key_cache_blocks": 2048,
+    "fp16_value_cache_blocks": 2048,
+    "cache_mode": "capped-2048"
+  },
+  "32768": {
+    "dense_vram_mb": 4294.967296,
+    "cert_tier1_vram_mb": 2427.589632,
+    "cert_scratch_vram_mb": 4303.355904,
+    "cert_key_scratch_vram_mb": 2147.483648,
+    "cert_value_scratch_vram_mb": 2147.483648,
+    "cert_pagein_scratch_vram_mb": 8.388608,
+    "cert_total_vram_mb": 6730.945536,
+    "cert_system_ram_mb": 4297.064448,
+    "vram_ratio": 1.5671703815460205,
+    "tier1_ratio": 0.5652172565460205,
+    "fp16_key_cache_blocks": 2048,
+    "fp16_value_cache_blocks": 2048,
+    "cache_mode": "capped-2048"
+  },
+  "65536": {
+    "dense_vram_mb": 8589.934592,
+    "cert_tier1_vram_mb": 4853.994496,
+    "cert_scratch_vram_mb": 4303.355904,
+    "cert_key_scratch_vram_mb": 2147.483648,
+    "cert_value_scratch_vram_mb": 2147.483648,
+    "cert_pagein_scratch_vram_mb": 8.388608,
+    "cert_total_vram_mb": 9157.3504,
+    "cert_system_ram_mb": 8592.031744,
+    "vram_ratio": 1.0660558938980103,
+    "tier1_ratio": 0.5650793313980103,
+    "fp16_key_cache_blocks": 2048,
+    "fp16_value_cache_blocks": 2048,
+    "cache_mode": "capped-2048"
+  },
+  "131072": {
+    "dense_vram_mb": 17179.869184,
+    "cert_tier1_vram_mb": 9706.804224,
+    "cert_scratch_vram_mb": 4303.355904,
+    "cert_key_scratch_vram_mb": 2147.483648,
+    "cert_value_scratch_vram_mb": 2147.483648,
+    "cert_pagein_scratch_vram_mb": 8.388608,
+    "cert_total_vram_mb": 14010.160128,
+    "cert_system_ram_mb": 17181.966336,
+    "vram_ratio": 0.8154986500740051,
+    "tier1_ratio": 0.5650103688240051,
+    "fp16_key_cache_blocks": 2048,
+    "fp16_value_cache_blocks": 2048,
+    "cache_mode": "capped-2048"
+  }
+}

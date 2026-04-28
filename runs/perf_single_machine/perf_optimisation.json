@@ -1,0 +1,41 @@
+{
+  "machine": "perf",
+  "benchmark": "performance",
+  "sub_benchmark": "optimisation",
+  "timestamp": "2026-04-27T08:58:16.623414+00:00",
+  "config": {
+    "k_max": 128,
+    "tau_cov": 0.995,
+    "group_size": 16,
+    "v_tol": 0.05,
+    "use_int4_values": true,
+    "use_asymmetric_keys": true,
+    "fp64_accumulators": true,
+    "block_size": 16,
+    "score_consistency_check": false,
+    "attention_backend": "native_blackwell"
+  },
+  "model": "NousResearch/Meta-Llama-3.1-8B",
+  "hardware": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition",
+  "results": {
+    "configurations": [
+      {
+        "name": "final_optimised_quality_matched",
+        "description": "Native Blackwell backend with asymmetric INT8 keys, INT4 g16 values, adaptive K*, ranking fallback, static resident full-bounded FP16 scratch caches.",
+        "cert_ms_mean": 153.36439275741577,
+        "dense_ms_mean": 63.36109697818756,
+        "ratio": 2.420481968773558,
+        "active_optimisations": [
+          "native_blackwell",
+          "asymmetric_int8_keys",
+          "int4_g16_values",
+          "adaptive_k_tau_cov_0.995",
+          "ranking_fallback_full_r1",
+          "static_resident_full_bounded_cache"
+        ],
+        "raw": "runs/perf_single_machine/raw/context_scaling/context_65536_quality_window_timing.json"
+      }
+    ],
+    "note": "This branch does not expose independent toggles for the rewritten pipeline stages."
+  }
+}

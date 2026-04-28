@@ -1,0 +1,156 @@
+{
+  "benchmark": "pg19_perplexity",
+  "model": "NousResearch/Meta-Llama-3.1-8B",
+  "context_length": 32768,
+  "num_chunks": 1,
+  "eval_start_frac": 0.5,
+  "top_k_override": null,
+  "max_certified_steps": null,
+  "truncated_certified_decode": false,
+  "telemetry_mode": "summary",
+  "collect_step_stats": false,
+  "score_consistency_interval": 1,
+  "cache_config": {
+    "v_tolerance": 0.05,
+    "quantization_mode": "asymmetric_int8_keys+int4_g16_values",
+    "asymmetric_keys": true,
+    "use_int4_values": true,
+    "group_size": 16,
+    "score_consistency_check": false,
+    "tau_cov": 0.995,
+    "k_min": 2,
+    "k_max": 128,
+    "ranking_fallback": true,
+    "ranking_r": 1,
+    "ranking_fallback_mode": "full",
+    "fp16_key_cache_blocks": 3072,
+    "fp16_value_cache_blocks": 3072,
+    "eps_guard": 0.01,
+    "exploration_rate": 0.02,
+    "rung1_threshold": 0.02,
+    "rung1_multiplier": 2.0,
+    "attention_backend": "native_blackwell",
+    "static_resident_cache": "1",
+    "splitk_blocks_per_split": "auto_native_32_24_16",
+    "cuda_graph_decode": false,
+    "runtime_profile": "0",
+    "code_sha": "427bf2c9738d8976834bedc9799c1ec44ab4a2cc-dirty",
+    "dotcache_config_hash": "2f293de15974488791a3e4c7e8cf2fe1179bf40fcd8c2b3226bfca7060bff261"
+  },
+  "dense": {
+    "perplexity": 9.701052678077694,
+    "total_nll": 74454.3046875,
+    "total_tokens": 32767,
+    "per_chunk": [
+      {
+        "chunk_idx": 12,
+        "book_idx": 8,
+        "nll": 74454.3046875,
+        "tokens": 32767
+      }
+    ],
+    "bpt_stats": {
+      "n_chunks": 1,
+      "bpt_mean": 3.2781413051390778,
+      "bpt_std": 0.0,
+      "bpt_se": 0.0,
+      "bpt_ci_lo": 3.2781413051390778,
+      "bpt_ci_hi": 3.2781413051390778,
+      "bpt_gaussian_lo": 3.2781413051390778,
+      "bpt_gaussian_hi": 3.2781413051390778
+    }
+  },
+  "certified": {
+    "perplexity": 9.701445548734304,
+    "total_nll": 74453.359375,
+    "total_tokens": 32766,
+    "skip_rate": 0.0,
+    "skipped_blocks": 0,
+    "total_blocks": 0,
+    "decode_steps": 16383,
+    "max_certified_steps": null,
+    "truncated_certified_decode": false,
+    "collect_step_stats": false,
+    "score_consistency_interval": 1,
+    "telemetry": {
+      "n_steps_aggregated": 0
+    },
+    "per_chunk": [
+      {
+        "chunk_idx": 12,
+        "book_idx": 8,
+        "prefix_nll": 37694.3515625,
+        "prefix_tokens": 16383,
+        "suffix_nll": 36759.0078125,
+        "suffix_tokens": 16383,
+        "nll": 74453.359375,
+        "tokens": 32766,
+        "skipped_blocks": 0,
+        "total_blocks": 0,
+        "telemetry": {
+          "n_steps_aggregated": 0
+        },
+        "cache_runtime": {
+          "static_resident_key_cache": true,
+          "static_resident_value_cache": true,
+          "static_resident_key_prepare_bytes": 1073741824,
+          "static_resident_value_prepare_bytes": 1073741824,
+          "vram_fp16_key_cache_bytes": 3221225472,
+          "vram_fp16_value_cache_bytes": 3221225472
+        },
+        "runtime_profile": {
+          "model_forward_ms_total": 2309044.848601101,
+          "qkv_projection_ms_total": 0.0,
+          "append_runtime_ms_total": 0.0,
+          "decode_runtime_ms_total": 0.0,
+          "output_projection_ms_total": 0.0,
+          "other_overhead_ms_total": 2309044.848601101,
+          "per_layer": []
+        }
+      }
+    ],
+    "bpt_stats": {
+      "n_chunks": 1,
+      "bpt_mean": 3.2781997298369134,
+      "bpt_std": 0.0,
+      "bpt_se": 0.0,
+      "bpt_ci_lo": 3.2781997298369134,
+      "bpt_ci_hi": 3.2781997298369134,
+      "bpt_gaussian_lo": 3.2781997298369134,
+      "bpt_gaussian_hi": 3.2781997298369134
+    },
+    "bpt_stats_suffix": {
+      "n_chunks": 1,
+      "bpt_mean": 3.237016314416921,
+      "bpt_std": 0.0,
+      "bpt_se": 0.0,
+      "bpt_ci_lo": 3.237016314416921,
+      "bpt_ci_hi": 3.237016314416921,
+      "bpt_gaussian_lo": 3.237016314416921,
+      "bpt_gaussian_hi": 3.237016314416921
+    },
+    "paired_delta_stats": {
+      "n_chunks": 1,
+      "mean_delta_ppl": 0.00039287065660964515,
+      "delta_ppl_ci_lo": 0.00039287065660964515,
+      "delta_ppl_ci_hi": 0.00039287065660964515,
+      "mean_ratio": 1.000040497734591,
+      "bootstrap_iters": 10000,
+      "bootstrap_seed": 20260425,
+      "per_chunk": [
+        {
+          "chunk_idx": 12,
+          "book_idx": 8,
+          "dense_ppl": 9.701052678077694,
+          "certified_ppl": 9.701445548734304,
+          "delta_ppl": 0.00039287065660964515,
+          "ratio": 1.000040497734591,
+          "dense_tokens": 32767,
+          "certified_tokens": 32766
+        }
+      ]
+    }
+  },
+  "ratio": 1.000040497734591,
+  "delta": 0.00039287065660964515
+}

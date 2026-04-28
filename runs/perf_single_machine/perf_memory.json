@@ -1,0 +1,82 @@
+{
+  "machine": "perf",
+  "benchmark": "performance",
+  "sub_benchmark": "memory",
+  "timestamp": "2026-04-27T09:47:57.586347+00:00",
+  "config": {
+    "k_max": 128,
+    "tau_cov": 0.995,
+    "group_size": 16,
+    "v_tol": 0.05,
+    "use_int4_values": true,
+    "use_asymmetric_keys": true,
+    "fp64_accumulators": true,
+    "block_size": 16,
+    "score_consistency_check": false,
+    "attention_backend": "native_blackwell"
+  },
+  "model": "NousResearch/Meta-Llama-3.1-8B",
+  "hardware": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition",
+  "results": {
+    "8192": {
+      "dense_vram_mb": 1073.741824,
+      "cert_tier1_vram_mb": 607.785984,
+      "cert_scratch_vram_mb": 3229.61408,
+      "cert_key_scratch_vram_mb": 1610.612736,
+      "cert_value_scratch_vram_mb": 1610.612736,
+      "cert_pagein_scratch_vram_mb": 8.388608,
+      "cert_total_vram_mb": 3837.400064,
+      "cert_system_ram_mb": 1075.838976,
+      "vram_ratio": 3.573857307434082,
+      "tier1_ratio": 0.566044807434082,
+      "fp16_key_cache_blocks": 1536,
+      "fp16_value_cache_blocks": 1536,
+      "cache_mode": "full-bounded"
+    },
+    "32768": {
+      "dense_vram_mb": 4294.967296,
+      "cert_tier1_vram_mb": 2427.589632,
+      "cert_scratch_vram_mb": 6450.839552,
+      "cert_key_scratch_vram_mb": 3221.225472,
+      "cert_value_scratch_vram_mb": 3221.225472,
+      "cert_pagein_scratch_vram_mb": 8.388608,
+      "cert_total_vram_mb": 8878.429184,
+      "cert_system_ram_mb": 4297.064448,
+      "vram_ratio": 2.0671703815460205,
+      "tier1_ratio": 0.5652172565460205,
+      "fp16_key_cache_blocks": 3072,
+      "fp16_value_cache_blocks": 3072,
+      "cache_mode": "full-bounded"
+    },
+    "65536": {
+      "dense_vram_mb": 8589.934592,
+      "cert_tier1_vram_mb": 4853.994496,
+      "cert_scratch_vram_mb": 10745.806848,
+      "cert_key_scratch_vram_mb": 5368.70912,
+      "cert_value_scratch_vram_mb": 5368.70912,
+      "cert_pagein_scratch_vram_mb": 8.388608,
+      "cert_total_vram_mb": 15599.801344,
+      "cert_system_ram_mb": 8592.031744,
+      "vram_ratio": 1.8160558938980103,
+      "tier1_ratio": 0.5650793313980103,
+      "fp16_key_cache_blocks": 5120,
+      "fp16_value_cache_blocks": 5120,
+      "cache_mode": "full-bounded"
+    },
+    "131072": {
+      "dense_vram_mb": 17179.869184,
+      "cert_tier1_vram_mb": 9706.804224,
+      "cert_scratch_vram_mb": 19335.74144,
+      "cert_key_scratch_vram_mb": 9663.676416,
+      "cert_value_scratch_vram_mb": 9663.676416,
+      "cert_pagein_scratch_vram_mb": 8.388608,
+      "cert_total_vram_mb": 29042.545664,
+      "cert_system_ram_mb": 17181.966336,
+      "vram_ratio": 1.6904986500740051,
+      "tier1_ratio": 0.5650103688240051,
+      "fp16_key_cache_blocks": 9216,
+      "fp16_value_cache_blocks": 9216,
+      "cache_mode": "full-bounded"
+    }
+  }
+}

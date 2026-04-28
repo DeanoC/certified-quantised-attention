@@ -1,0 +1,80 @@
+{
+  "slice_id": 16,
+  "mode": "context",
+  "model": "NousResearch/Meta-Llama-3.1-8B",
+  "cache_mode": "full-bounded",
+  "niah_trials_per_slice": 10,
+  "created": "2026-04-27T10:37:00.967051+00:00",
+  "provenance": {
+    "host": "afa25ee8691c",
+    "cwd": "/workspace/DotCache",
+    "python": "/workspace/DotCache/.venv/bin/python",
+    "git_commit": "72293650c06917950a4252ef48208f62dbb510e9",
+    "git_branch": "port-to-paper-20260424",
+    "git_dirty": true
+  },
+  "jobs": [
+    {
+      "slice_id": 16,
+      "benchmark": "pg19",
+      "context_length": 32768,
+      "output": "runs/paper_v2_distributed_32k_slices_0010_0019/slice_0016/32K/pg19_slice_0016_32K.json",
+      "log": "runs/paper_v2_distributed_32k_slices_0010_0019/slice_0016/32K/pg19_slice_0016_32K.log",
+      "command_string": "/workspace/DotCache/.venv/bin/python /workspace/DotCache/benchmarks/paper/pg19_perplexity.py --context 32768 --chunk-index 16 --telemetry-mode summary --certified-warmup-steps 128 --output runs/paper_v2_distributed_32k_slices_0010_0019/slice_0016/32K/pg19_slice_0016_32K.json --model NousResearch/Meta-Llama-3.1-8B --v-tolerance 0.05 --use-int4-values --group-size 16 --tau-cov 0.995 --k-min 2 --k-max 128 --ranking-fallback --ranking-r 1 --ranking-fallback-mode full --eps-guard 0.01 --exploration-rate 0.02 --rung1-threshold 0.02 --rung1-multiplier 2.0 --fp16-key-cache-blocks 3072 --fp16-value-cache-blocks 3072",
+      "cache_mode": "full-bounded",
+      "recommended_v2_cache_blocks": [
+        1792,
+        768
+      ]
+    },
+    {
+      "slice_id": 16,
+      "benchmark": "ruler",
+      "context_length": 32768,
+      "output": "runs/paper_v2_distributed_32k_slices_0010_0019/slice_0016/32K/ruler_slice_0016_32K.json",
+      "log": "runs/paper_v2_distributed_32k_slices_0010_0019/slice_0016/32K/ruler_slice_0016_32K.log",
+      "command_string": "/workspace/DotCache/.venv/bin/python /workspace/DotCache/benchmarks/paper/ruler.py --contexts 32768 --sample-index 16 --output runs/paper_v2_distributed_32k_slices_0010_0019/slice_0016/32K/ruler_slice_0016_32K.json --model NousResearch/Meta-Llama-3.1-8B --v-tolerance 0.05 --use-int4-values --group-size 16 --tau-cov 0.995 --k-min 2 --k-max 128 --ranking-fallback --ranking-r 1 --ranking-fallback-mode full --eps-guard 0.01 --exploration-rate 0.02 --rung1-threshold 0.02 --rung1-multiplier 2.0 --fp16-key-cache-blocks 3072 --fp16-value-cache-blocks 3072",
+      "cache_mode": "full-bounded",
+      "recommended_v2_cache_blocks": [
+        1792,
+        768
+      ]
+    }
+  ],
+  "completed": [
+    {
+      "slice_id": 16,
+      "benchmark": "pg19",
+      "context_length": 32768,
+      "output": "runs/paper_v2_distributed_32k_slices_0010_0019/slice_0016/32K/pg19_slice_0016_32K.json",
+      "log": "runs/paper_v2_distributed_32k_slices_0010_0019/slice_0016/32K/pg19_slice_0016_32K.log",
+      "command_string": "/workspace/DotCache/.venv/bin/python /workspace/DotCache/benchmarks/paper/pg19_perplexity.py --context 32768 --chunk-index 16 --telemetry-mode summary --certified-warmup-steps 128 --output runs/paper_v2_distributed_32k_slices_0010_0019/slice_0016/32K/pg19_slice_0016_32K.json --model NousResearch/Meta-Llama-3.1-8B --v-tolerance 0.05 --use-int4-values --group-size 16 --tau-cov 0.995 --k-min 2 --k-max 128 --ranking-fallback --ranking-r 1 --ranking-fallback-mode full --eps-guard 0.01 --exploration-rate 0.02 --rung1-threshold 0.02 --rung1-multiplier 2.0 --fp16-key-cache-blocks 3072 --fp16-value-cache-blocks 3072",
+      "cache_mode": "full-bounded",
+      "recommended_v2_cache_blocks": [
+        1792,
+        768
+      ],
+      "started": "2026-04-27T10:37:01.068033+00:00",
+      "ended": "2026-04-27T11:16:57.263750+00:00",
+      "wall_seconds": 2396.1956911220914,
+      "exit_code": 0
+    },
+    {
+      "slice_id": 16,
+      "benchmark": "ruler",
+      "context_length": 32768,
+      "output": "runs/paper_v2_distributed_32k_slices_0010_0019/slice_0016/32K/ruler_slice_0016_32K.json",
+      "log": "runs/paper_v2_distributed_32k_slices_0010_0019/slice_0016/32K/ruler_slice_0016_32K.log",
+      "command_string": "/workspace/DotCache/.venv/bin/python /workspace/DotCache/benchmarks/paper/ruler.py --contexts 32768 --sample-index 16 --output runs/paper_v2_distributed_32k_slices_0010_0019/slice_0016/32K/ruler_slice_0016_32K.json --model NousResearch/Meta-Llama-3.1-8B --v-tolerance 0.05 --use-int4-values --group-size 16 --tau-cov 0.995 --k-min 2 --k-max 128 --ranking-fallback --ranking-r 1 --ranking-fallback-mode full --eps-guard 0.01 --exploration-rate 0.02 --rung1-threshold 0.02 --rung1-multiplier 2.0 --fp16-key-cache-blocks 3072 --fp16-value-cache-blocks 3072",
+      "cache_mode": "full-bounded",
+      "recommended_v2_cache_blocks": [
+        1792,
+        768
+      ],
+      "started": "2026-04-27T11:16:57.263944+00:00",
+      "ended": "2026-04-27T11:20:20.957904+00:00",
+      "wall_seconds": 203.6939408549806,
+      "exit_code": 0
+    }
+  ]
+}

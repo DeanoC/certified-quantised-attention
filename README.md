@@ -1,66 +1,163 @@
 # Certified Quantised Attention
 
-Minimal review repository for the paper `Certified_Quantised_Attention.tex`.
+Reviewer-facing extraction for the paper in
+`paper/Certified_Quantised_Attention.tex`.
 
-This repository is being extracted from the experimental [`DotCache`](https://github.com/DeanoC/DotCache) research repo . 
-This repo has only the paper, implementation code, benchmark drivers, and JSON
-results required for reviewers to inspect and reproduce the reported claims.
+This repository is a cleaned extraction from the current DotCache paper branch.
+It keeps the implementation, benchmark drivers, and retained JSON artifacts
+needed to inspect or rerun the paper results. DotCache experiments unrelated to
+the paper path have been removed.
 
 ## Layout
 
 ```text
 paper/
   Certified_Quantised_Attention.tex
-src/
-  certified_attention.py
-  tiered_cache.py
-  adaptive_selector.py
-  fallback_ladder.py
-  quantisation.py
+dotcache/
+  integrations/llama.py
+  kernels/
+  backends/
 benchmarks/
-  run_pg19.py
-  run_niah.py
-  run_ruler.py
-  run_throughput.py
-results/
-  README.md
+  paper/
+  run_experiment_v2_sweep.py
+runs/
+  paper_v2_*/
+  perf_single_machine/
+  niah_64k_remaining/
+  ruler_* follow-ups
+tests/
+  paper CLI, provenance, CI helper, and CUDA smoke tests
 ```
 
-## Extraction Status
+## Reviewer Workflow
 
-- `paper/`: contains `Certified_Quantised_Attention.tex`. The current file is
-  a normalised short TeX placeholder; replace it with the full submission source
-  before release.
-- `src/`: contains the extracted certified attention implementation and helper
-  kernels from `DotCache/dotcache/kernels`.
-- `benchmarks/`: contains the extracted PG-19, NIAH, RULER, and throughput
-  entrypoints, now rewritten to use local benchmark support modules.
-- `results/`: contains the JSON result files currently identified as backing
-  the paper tables, plus raw April 2026 sweep outputs for traceability.
+### Environment
 
-## Intended Reviewer Workflow
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+export HF_TOKEN=...  # required for gated model access when applicable
+```
 
-1. Install dependencies with `pip install -r requirements.txt`.
-2. Inspect the implementation in `src/`.
-3. Run the relevant benchmark script from `benchmarks/`.
-4. Compare generated outputs with the checked-in JSON files in `results/`.
+Full benchmark reproduction requires a CUDA GPU with enough VRAM for
+LLaMA 3.1-8B, a CUDA-enabled PyTorch install, and model download access. The
+native Blackwell backend additionally requires NVCC/CUDA_HOME and an SM 12.x
+GPU; otherwise the benchmark helpers fall back to the Triton backend.
 
-## Current Extraction Boundary
+### Quick Validation
 
-The reviewer-facing implementation is concentrated in:
+```bash
+pytest -q
+python benchmarks/run_experiment_v2_sweep.py --dry-run --tier 2 --no-push
+python benchmarks/run_experiment_v2_sweep.py --smoke --tier 1 --only pg19,8192 --no-push
+```
 
-- `src/certified_attention.py`
-- `src/tiered_cache.py`
-- `src/adaptive_selector.py`
-- `src/fallback_ladder.py`
-- `src/quantisation.py`
+The smoke command loads the model and runs a reduced PG-19 cell. It is intended
+to validate the runtime path before launching multi-hour cells.
 
-Additional helper files in `src/` are direct dependencies of the fused Triton
-path and are intentionally kept visible:
+### Direct Paper Benchmark Defaults
 
-- `src/fused_score_certify.py`
-- `src/score_phase_triton.py`
-- `src/selective_attend_triton.py`
-- `src/llama_integration.py`
-- `src/config.py`
-- `src/calibrated_profile.py`
+The direct benchmark CLIs default to the paper operating point for the certified
+path: `tau_cov=0.995`, `k_min=2`, `k_max=128`, ranking fallback enabled with
+`r=1`, `eps_guard=0.01`, `exploration_rate=0.02`, and Rung-1 expansion
+`threshold=0.02`, `multiplier=2.0`. Only the cache/value format remains
+explicit on the command line so the output provenance records it.
+
+Example single-cell reruns:
+
+```bash
+python benchmarks/paper/pg19_perplexity.py \
+  --context 8192 --chunk-index 0 \
+  --v-tolerance 0.05 --use-int4-values --group-size 16 \
+  --output runs/repro_single/pg19_8k_slice0.json
+
+python benchmarks/paper/niah.py \
+  --contexts 8192 --trial-start 0 --trial-count 5 --needles 10 \
+  --v-tolerance 0.05 --use-int4-values --group-size 16 \
+  --output runs/repro_single/niah_8k_trials0_4.json
+
+python benchmarks/paper/ruler.py \
+  --contexts 8192 --sample-index 0 \
+  --v-tolerance 0.05 --use-int4-values --group-size 16 \
+  --output runs/repro_single/ruler_8k_sample0.json
+```
+
+Use `--no-ranking-fallback`, `--tau-cov 0`, or alternative `--k-max` values
+only for ablations; those are not the paper default.
+
+### Distributed Quality Runs
+
+`benchmarks/paper/run_distributed_quality_slice.py` is the reviewer-facing
+driver for the retained quality artifacts. It records the exact command,
+cache mode, git revision, and per-cell JSON path in each slice manifest.
+
+```bash
+# One representative slice across all three benchmarks at 8K.
+python benchmarks/paper/run_distributed_quality_slice.py \
+  --slice-id 0 --mode context --context 8192 \
+  --benches pg19 niah ruler --niah-trials-per-slice 5 \
+  --cache-mode full-bounded --output-dir runs/repro_quality --resume
+
+# PG-19: 20 chunks per context.
+for ctx in 8192 32768 65536; do
+  for slice in $(seq 0 19); do
+    python benchmarks/paper/run_distributed_quality_slice.py \
+      --slice-id "$slice" --mode context --context "$ctx" \
+      --benches pg19 --cache-mode full-bounded \
+      --output-dir runs/repro_quality --resume
+  done
+done
+
+# NIAH: 100 paired trials per context, packed as 20 slices x 5 trials.
+for ctx in 8192 32768 65536; do
+  for slice in $(seq 0 19); do
+    python benchmarks/paper/run_distributed_quality_slice.py \
+      --slice-id "$slice" --mode context --context "$ctx" \
+      --benches niah --niah-trials-per-slice 5 \
+      --cache-mode full-bounded --output-dir runs/repro_quality --resume
+  done
+done
+
+# RULER: 50 samples per context.
+for ctx in 8192 32768 65536; do
+  for slice in $(seq 0 49); do
+    python benchmarks/paper/run_distributed_quality_slice.py \
+      --slice-id "$slice" --mode context --context "$ctx" \
+      --benches ruler --cache-mode full-bounded \
+      --output-dir runs/repro_quality --resume
+  done
+done
+```
+
+For selected 128K follow-ups, use `--context 131072` with the same slice
+driver and the reduced slice counts described in the paper.
+
+### Performance Runs
+
+Single-machine performance and memory artifacts are produced by
+`benchmarks/paper/run_single_machine_perf.py`:
+
+```bash
+for part in p1 p2 p3 p4 p5 p6 p7_pg19; do
+  python benchmarks/paper/run_single_machine_perf.py "$part" \
+    --output-dir runs/repro_perf
+done
+```
+
+The `r*_cap2048` modes reproduce the capped-cache follow-up artifacts:
+
+```bash
+for part in r1_cap2048 r2_cap2048 r3_cap2048 r4_pg19_cap2048 r4_niah_cap2048; do
+  python benchmarks/paper/run_single_machine_perf.py "$part" \
+    --output-dir runs/repro_perf_cap2048
+done
+```
+
+### Artifact Checks
+
+Every benchmark JSON embeds a `cache_config` block with the certified operating
+point, backend, cache sizes, git SHA, and a deterministic config hash. The
+checked-in `runs/` tree is the retained artifact set used for paper review;
+new reruns should be written under a separate `runs/repro_*` directory and
+compared against the corresponding checked-in JSON/summary files.

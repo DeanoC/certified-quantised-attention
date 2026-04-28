@@ -1,0 +1,208 @@
+{
+  "results": {
+    "dense": [
+      {
+        "context_tokens": 65352,
+        "target_context": 65536,
+        "depth": 0.1,
+        "needle_idx": 9,
+        "mode": "dense",
+        "correct": false,
+        "expected": "Dr. Nakamura",
+        "generated": " The secret is the history of mathematics.\n",
+        "trial_idx": 19
+      }
+    ],
+    "certified": [
+      {
+        "context_tokens": 65352,
+        "target_context": 65536,
+        "depth": 0.1,
+        "needle_idx": 9,
+        "mode": "certified",
+        "correct": false,
+        "expected": "Dr. Nakamura",
+        "generated": " The secret, code, location, budget, or ID mentioned in the special statement is: The history of mathematics spans thousands of years and encompasses many different cultures and civilizations. From th",
+        "ranking_heads_total": 50176,
+        "ranking_disagree_r1": 58,
+        "ranking_disagree_r3": 822,
+        "ranking_fallback_triggered": 215,
+        "rung1_fired": true,
+        "rung2_fired": true,
+        "rung3_fired": true,
+        "rung4_fired": false,
+        "rung1_fired_layers": 1556,
+        "rung2_fired_layers": 1568,
+        "rung3_fired_layers": 131,
+        "rung4_fired_layers": 0,
+        "boundary_check_fired": true,
+        "boundary_check_fired_layers": 83,
+        "boundary_check_triggered_heads_total": 158,
+        "e_key_step_mean": 0.31951912154315265,
+        "e_key_step_max": 7.788513660430908,
+        "v_max_global": 22.36509895324707,
+        "e_val_max": 0.049999989569187164,
+        "e_val_mean": 0.024133114358030106,
+        "e_val_pre_rung2_max": 0.10401653498411179,
+        "e_val_pre_rung2_mean": 0.07604276247759711,
+        "value_fallback_blocks": 104963,
+        "value_fallback_head_blocks": 309142,
+        "tail_mass_int8_est_step_mean": 0.05884714848932107,
+        "tail_mass_int8_est_step_max": 0.8594199419021606,
+        "k_star_mean": 193.8736647002551,
+        "k_star_max": 256,
+        "h2d_key_bytes": 0,
+        "h2d_value_bytes": 0,
+        "h2d_total_bytes": 0,
+        "vram_fp16_key_cache_bytes": 209942806528,
+        "vram_fp16_value_cache_bytes": 263066746880,
+        "fp16_value_cache_hits_step": 0,
+        "fp16_value_cache_misses_step": 0,
+        "fp16_value_cache_evictions_step": 0,
+        "fp16_value_cache_needed_blocks_step": 0,
+        "fp16_value_cache_overflow_step": 0,
+        "trial_idx": 19
+      }
+    ]
+  },
+  "heatmaps": {
+    "dense": {
+      "64K_d0.1": 0.0
+    },
+    "certified": {
+      "64K_d0.1": 0.0
+    }
+  },
+  "dense_accuracy": 0.0,
+  "certified_accuracy": 0.0,
+  "critical_failures": 0,
+  "paired_stats": {
+    "n": 1,
+    "dense_correct": 0,
+    "certified_correct": 0,
+    "dense_accuracy": 0.0,
+    "certified_accuracy": 0.0,
+    "delta_accuracy": 0.0,
+    "delta_pp": 0.0,
+    "bootstrap_ci_lo": 0.0,
+    "bootstrap_ci_hi": 0.0,
+    "bootstrap_ci_pp_lo": 0.0,
+    "bootstrap_ci_pp_hi": 0.0,
+    "bootstrap_iters": 10000,
+    "bootstrap_seed": 20260425,
+    "mcnemar_p": 1.0,
+    "mcnemar": {
+      "test": "exact_two_sided_binomial",
+      "p_value": 1.0,
+      "discordant": 0,
+      "dense_only": 0,
+      "certified_only": 0
+    },
+    "paired_table": {
+      "both_correct": 0,
+      "dense_only": 0,
+      "certified_only": 0,
+      "both_wrong": 1
+    }
+  },
+  "paired_stats_by_context": {
+    "64K": {
+      "n": 1,
+      "dense_correct": 0,
+      "certified_correct": 0,
+      "dense_accuracy": 0.0,
+      "certified_accuracy": 0.0,
+      "delta_accuracy": 0.0,
+      "delta_pp": 0.0,
+      "bootstrap_ci_lo": 0.0,
+      "bootstrap_ci_hi": 0.0,
+      "bootstrap_ci_pp_lo": 0.0,
+      "bootstrap_ci_pp_hi": 0.0,
+      "bootstrap_iters": 10000,
+      "bootstrap_seed": 20260425,
+      "mcnemar_p": 1.0,
+      "mcnemar": {
+        "test": "exact_two_sided_binomial",
+        "p_value": 1.0,
+        "discordant": 0,
+        "dense_only": 0,
+        "certified_only": 0
+      },
+      "paired_table": {
+        "both_correct": 0,
+        "dense_only": 0,
+        "certified_only": 0,
+        "both_wrong": 1
+      }
+    }
+  },
+  "paired_stats_by_needle_group": {
+    "harder": {
+      "n": 1,
+      "dense_correct": 0,
+      "certified_correct": 0,
+      "dense_accuracy": 0.0,
+      "certified_accuracy": 0.0,
+      "delta_accuracy": 0.0,
+      "delta_pp": 0.0,
+      "bootstrap_ci_lo": 0.0,
+      "bootstrap_ci_hi": 0.0,
+      "bootstrap_ci_pp_lo": 0.0,
+      "bootstrap_ci_pp_hi": 0.0,
+      "bootstrap_iters": 10000,
+      "bootstrap_seed": 20260426,
+      "mcnemar_p": 1.0,
+      "mcnemar": {
+        "test": "exact_two_sided_binomial",
+        "p_value": 1.0,
+        "discordant": 0,
+        "dense_only": 0,
+        "certified_only": 0
+      },
+      "paired_table": {
+        "both_correct": 0,
+        "dense_only": 0,
+        "certified_only": 0,
+        "both_wrong": 1
+      }
+    }
+  },
+  "cache_config": {
+    "v_tolerance": 0.05,
+    "quantization_mode": "asymmetric_int8_keys+int4_g16_values",
+    "asymmetric_keys": true,
+    "use_int4_values": true,
+    "group_size": 16,
+    "score_consistency_check": false,
+    "tau_cov": 0.995,
+    "k_min": 2,
+    "k_max": 128,
+    "ranking_fallback": true,
+    "ranking_r": 1,
+    "ranking_fallback_mode": "full",
+    "fp16_key_cache_blocks": 5120,
+    "fp16_value_cache_blocks": 5120,
+    "eps_guard": 0.01,
+    "exploration_rate": 0.02,
+    "rung1_threshold": 0.02,
+    "rung1_multiplier": 2.0,
+    "attention_backend": "native_blackwell",
+    "static_resident_cache": "1",
+    "splitk_blocks_per_split": "auto_native_32_24_16",
+    "cuda_graph_decode": false,
+    "runtime_profile": "0",
+    "code_sha": "44b8e3f22d107b2a0e0bfff3faf71bbdcf82724e-dirty",
+    "dotcache_config_hash": "e7f3b80918715aae2cca0ab7be5953b44d59220cacd9f950c872b0eb8c6bc882"
+  },
+  "ranking_fallback_summary": {
+    "mode": "full",
+    "r": 1,
+    "heads_total": 50176,
+    "disagree_r1": 58,
+    "disagree_r3": 822,
+    "triggered": 215,
+    "disagree_rate_r1": 0.0011559311224489796,
+    "disagree_rate_r3": 0.01638233418367347,
+    "fallback_rate": 0.0042849170918367345
+  }
+}

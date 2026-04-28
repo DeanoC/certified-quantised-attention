@@ -1,0 +1,82 @@
+{
+  "machine": "perf",
+  "benchmark": "performance",
+  "sub_benchmark": "context_scaling",
+  "timestamp": "2026-04-27T08:52:14.968313+00:00",
+  "config": {
+    "k_max": 128,
+    "tau_cov": 0.995,
+    "group_size": 16,
+    "v_tol": 0.05,
+    "use_int4_values": true,
+    "use_asymmetric_keys": true,
+    "fp64_accumulators": true,
+    "block_size": 16,
+    "score_consistency_check": false,
+    "attention_backend": "native_blackwell"
+  },
+  "model": "NousResearch/Meta-Llama-3.1-8B",
+  "hardware": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition",
+  "results": {
+    "8192": {
+      "dense_ms_mean": 60.46676176786423,
+      "dense_ms_std": 3.5977725760244215,
+      "cert_ms_mean": 139.8773015141487,
+      "cert_ms_std": 31.35698490366195,
+      "ratio": 2.313292417595416,
+      "int8_tail_fraction": 0.38270059073990526,
+      "k_star_mean": 158.8021494547526,
+      "rung1_expansion_rate": 1.0,
+      "fp16_key_cache_blocks": 1536,
+      "fp16_value_cache_blocks": 1536,
+      "cache_mode": "full-bounded",
+      "raw": "runs/perf_single_machine/raw/context_scaling/context_8192_quality_window_timing.json",
+      "telemetry_raw": "runs/perf_single_machine/raw/context_scaling/context_8192_quality_window_telemetry.json"
+    },
+    "32768": {
+      "dense_ms_mean": 62.16752091050148,
+      "dense_ms_std": 3.510492308903464,
+      "cert_ms_mean": 130.48875111341476,
+      "cert_ms_std": 4.806834700890484,
+      "ratio": 2.0989859206589707,
+      "int8_tail_fraction": 0.7729556681163875,
+      "k_star_mean": 216.22212812635632,
+      "rung1_expansion_rate": 1.0,
+      "fp16_key_cache_blocks": 3072,
+      "fp16_value_cache_blocks": 3072,
+      "cache_mode": "full-bounded",
+      "raw": "runs/perf_single_machine/raw/context_scaling/context_32768_quality_window_timing.json",
+      "telemetry_raw": "runs/perf_single_machine/raw/context_scaling/context_32768_quality_window_telemetry.json"
+    },
+    "65536": {
+      "dense_ms_mean": 63.36109697818756,
+      "dense_ms_std": 3.4407337178639055,
+      "cert_ms_mean": 153.36439275741577,
+      "cert_ms_std": 31.5706503807791,
+      "ratio": 2.420481968773558,
+      "int8_tail_fraction": 0.8754300917308884,
+      "k_star_mean": 218.05803934733072,
+      "rung1_expansion_rate": 1.0,
+      "fp16_key_cache_blocks": 5120,
+      "fp16_value_cache_blocks": 5120,
+      "cache_mode": "full-bounded",
+      "raw": "runs/perf_single_machine/raw/context_scaling/context_65536_quality_window_timing.json",
+      "telemetry_raw": "runs/perf_single_machine/raw/context_scaling/context_65536_quality_window_telemetry.json"
+    },
+    "131072": {
+      "dense_ms_mean": 73.14014279842377,
+      "dense_ms_std": 2.7715754530074084,
+      "cert_ms_mean": 193.8439381122589,
+      "cert_ms_std": 32.19815684833908,
+      "ratio": 2.6503084447961514,
+      "int8_tail_fraction": 0.9270869661594681,
+      "k_star_mean": 220.60820855034723,
+      "rung1_expansion_rate": 1.0,
+      "fp16_key_cache_blocks": 9216,
+      "fp16_value_cache_blocks": 9216,
+      "cache_mode": "full-bounded",
+      "raw": "runs/perf_single_machine/raw/context_scaling/context_131072_quality_window_timing.json",
+      "telemetry_raw": "runs/perf_single_machine/raw/context_scaling/context_131072_quality_window_telemetry.json"
+    }
+  }
+}

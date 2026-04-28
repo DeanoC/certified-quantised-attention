@@ -1,0 +1,53 @@
+{
+  "machine": "perf",
+  "benchmark": "performance",
+  "sub_benchmark": "phase_breakdown",
+  "timestamp": "2026-04-27T08:58:18.269916+00:00",
+  "config": {
+    "k_max": 128,
+    "tau_cov": 0.995,
+    "group_size": 16,
+    "v_tol": 0.05,
+    "use_int4_values": true,
+    "use_asymmetric_keys": true,
+    "fp64_accumulators": true,
+    "block_size": 16,
+    "score_consistency_check": false,
+    "attention_backend": "native_blackwell"
+  },
+  "model": "NousResearch/Meta-Llama-3.1-8B",
+  "hardware": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition",
+  "results": {
+    "phase1_int8_scoring_pct": 3.3961924890253092,
+    "phase2_fp16_attend_pct": 13.388312493595818,
+    "adaptive_selection_pct": 7.52978181404818,
+    "value_decompression_pct": 5.518745107630717,
+    "ranking_check_pct": 7.155929469958962,
+    "h2d_pagein_pct": 0.0,
+    "rung3_dense_recompute_pct": 1.9297385086990875,
+    "non_attention_pct": 61.08130011704193,
+    "phase_timings_ms": {
+      "phase1_int8_scoring_ms": 3351.7262080311775,
+      "adaptive_selection_ms": 7431.194529891014,
+      "ranking_check_ms": 7062.237027138472,
+      "value_check_ms": 5446.488287240267,
+      "phase2_fused_attend_ms": 13213.019583284855,
+      "rung3_dense_recompute_ms": 1904.4724806249142
+    },
+    "native_profile": {
+      "calls": 16000,
+      "partial_ms_total": 8405.059308171272,
+      "reduce_ms_total": 163.76112094894052,
+      "total_ms": 8568.820429120213,
+      "partial_ms_per_call": 0.5253162067607046,
+      "reduce_ms_per_call": 0.010235070059308782
+    },
+    "total_cert_ms_mean": 197.38140396118163,
+    "total_dense_ms_mean": 63.380634803771976,
+    "overhead_ms": 134.00076915740965,
+    "fp16_key_cache_blocks": 5120,
+    "fp16_value_cache_blocks": 5120,
+    "cache_mode": "full-bounded",
+    "raw": "runs/perf_single_machine/raw/phase_breakdown_64k.json"
+  }
+}

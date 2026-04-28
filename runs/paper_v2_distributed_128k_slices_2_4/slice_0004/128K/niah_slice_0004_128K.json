@@ -1,0 +1,208 @@
+{
+  "results": {
+    "dense": [
+      {
+        "context_tokens": 130845,
+        "target_context": 131072,
+        "depth": 0.0,
+        "needle_idx": 4,
+        "mode": "dense",
+        "correct": false,
+        "expected": "RX-9031",
+        "generated": " The secret is the history of mathematics. The code is the history of mathematics. The location is the history of mathematics. The budget is the history of mathematics. The ID is the history of mathem",
+        "trial_idx": 4
+      }
+    ],
+    "certified": [
+      {
+        "context_tokens": 130845,
+        "target_context": 131072,
+        "depth": 0.0,
+        "needle_idx": 4,
+        "mode": "certified",
+        "correct": false,
+        "expected": "RX-9031",
+        "generated": " The secret is the history of mathematics. The code is the history of mathematics. The location is the history of mathematics. The budget is the history of mathematics. The ID is the history of mathem",
+        "ranking_heads_total": 50176,
+        "ranking_disagree_r1": 165,
+        "ranking_disagree_r3": 1731,
+        "ranking_fallback_triggered": 2270,
+        "rung1_fired": true,
+        "rung2_fired": true,
+        "rung3_fired": true,
+        "rung4_fired": false,
+        "rung1_fired_layers": 1568,
+        "rung2_fired_layers": 1568,
+        "rung3_fired_layers": 680,
+        "rung4_fired_layers": 0,
+        "boundary_check_fired": true,
+        "boundary_check_fired_layers": 617,
+        "boundary_check_triggered_heads_total": 2137,
+        "e_key_step_mean": 0.4425702624436354,
+        "e_key_step_max": 9.116984367370605,
+        "v_max_global": 23.02040672302246,
+        "e_val_max": 0.049999989569187164,
+        "e_val_mean": 0.037923621673348396,
+        "e_val_pre_rung2_max": 0.09813589602708817,
+        "e_val_pre_rung2_mean": 0.07518581066717756,
+        "value_fallback_blocks": 658415,
+        "value_fallback_head_blocks": 3528879,
+        "tail_mass_int8_est_step_mean": 0.10632899378150777,
+        "tail_mass_int8_est_step_max": 0.9566797614097595,
+        "k_star_mean": 224.29932637117346,
+        "k_star_max": 256,
+        "h2d_key_bytes": 0,
+        "h2d_value_bytes": 0,
+        "h2d_total_bytes": 0,
+        "vram_fp16_key_cache_bytes": 420258119680,
+        "vram_fp16_value_cache_bytes": 473520144384,
+        "fp16_value_cache_hits_step": 0,
+        "fp16_value_cache_misses_step": 0,
+        "fp16_value_cache_evictions_step": 0,
+        "fp16_value_cache_needed_blocks_step": 0,
+        "fp16_value_cache_overflow_step": 0,
+        "trial_idx": 4
+      }
+    ]
+  },
+  "heatmaps": {
+    "dense": {
+      "128K_d0.0": 0.0
+    },
+    "certified": {
+      "128K_d0.0": 0.0
+    }
+  },
+  "dense_accuracy": 0.0,
+  "certified_accuracy": 0.0,
+  "critical_failures": 0,
+  "paired_stats": {
+    "n": 1,
+    "dense_correct": 0,
+    "certified_correct": 0,
+    "dense_accuracy": 0.0,
+    "certified_accuracy": 0.0,
+    "delta_accuracy": 0.0,
+    "delta_pp": 0.0,
+    "bootstrap_ci_lo": 0.0,
+    "bootstrap_ci_hi": 0.0,
+    "bootstrap_ci_pp_lo": 0.0,
+    "bootstrap_ci_pp_hi": 0.0,
+    "bootstrap_iters": 10000,
+    "bootstrap_seed": 20260425,
+    "mcnemar_p": 1.0,
+    "mcnemar": {
+      "test": "exact_two_sided_binomial",
+      "p_value": 1.0,
+      "discordant": 0,
+      "dense_only": 0,
+      "certified_only": 0
+    },
+    "paired_table": {
+      "both_correct": 0,
+      "dense_only": 0,
+      "certified_only": 0,
+      "both_wrong": 1
+    }
+  },
+  "paired_stats_by_context": {
+    "128K": {
+      "n": 1,
+      "dense_correct": 0,
+      "certified_correct": 0,
+      "dense_accuracy": 0.0,
+      "certified_accuracy": 0.0,
+      "delta_accuracy": 0.0,
+      "delta_pp": 0.0,
+      "bootstrap_ci_lo": 0.0,
+      "bootstrap_ci_hi": 0.0,
+      "bootstrap_ci_pp_lo": 0.0,
+      "bootstrap_ci_pp_hi": 0.0,
+      "bootstrap_iters": 10000,
+      "bootstrap_seed": 20260425,
+      "mcnemar_p": 1.0,
+      "mcnemar": {
+        "test": "exact_two_sided_binomial",
+        "p_value": 1.0,
+        "discordant": 0,
+        "dense_only": 0,
+        "certified_only": 0
+      },
+      "paired_table": {
+        "both_correct": 0,
+        "dense_only": 0,
+        "certified_only": 0,
+        "both_wrong": 1
+      }
+    }
+  },
+  "paired_stats_by_needle_group": {
+    "original": {
+      "n": 1,
+      "dense_correct": 0,
+      "certified_correct": 0,
+      "dense_accuracy": 0.0,
+      "certified_accuracy": 0.0,
+      "delta_accuracy": 0.0,
+      "delta_pp": 0.0,
+      "bootstrap_ci_lo": 0.0,
+      "bootstrap_ci_hi": 0.0,
+      "bootstrap_ci_pp_lo": 0.0,
+      "bootstrap_ci_pp_hi": 0.0,
+      "bootstrap_iters": 10000,
+      "bootstrap_seed": 20260425,
+      "mcnemar_p": 1.0,
+      "mcnemar": {
+        "test": "exact_two_sided_binomial",
+        "p_value": 1.0,
+        "discordant": 0,
+        "dense_only": 0,
+        "certified_only": 0
+      },
+      "paired_table": {
+        "both_correct": 0,
+        "dense_only": 0,
+        "certified_only": 0,
+        "both_wrong": 1
+      }
+    }
+  },
+  "cache_config": {
+    "v_tolerance": 0.05,
+    "quantization_mode": "asymmetric_int8_keys+int4_g16_values",
+    "asymmetric_keys": true,
+    "use_int4_values": true,
+    "group_size": 16,
+    "score_consistency_check": false,
+    "tau_cov": 0.995,
+    "k_min": 2,
+    "k_max": 128,
+    "ranking_fallback": true,
+    "ranking_r": 1,
+    "ranking_fallback_mode": "full",
+    "fp16_key_cache_blocks": 9216,
+    "fp16_value_cache_blocks": 9216,
+    "eps_guard": 0.01,
+    "exploration_rate": 0.02,
+    "rung1_threshold": 0.02,
+    "rung1_multiplier": 2.0,
+    "attention_backend": "native_blackwell",
+    "static_resident_cache": "1",
+    "splitk_blocks_per_split": "auto_native_32_24_16",
+    "cuda_graph_decode": false,
+    "runtime_profile": "0",
+    "code_sha": "822f221e2c58bcf462fed8b63c829d66b1a2bfec-dirty",
+    "dotcache_config_hash": "2b44157bbb6e146b4ef9ba8ea1afb3fef34a03a994ab7f5bb34599407d6bfe39"
+  },
+  "ranking_fallback_summary": {
+    "mode": "full",
+    "r": 1,
+    "heads_total": 50176,
+    "disagree_r1": 165,
+    "disagree_r3": 1731,
+    "triggered": 2270,
+    "disagree_rate_r1": 0.003288424744897959,
+    "disagree_rate_r3": 0.034498565051020405,
+    "fallback_rate": 0.045240752551020405
+  }
+}

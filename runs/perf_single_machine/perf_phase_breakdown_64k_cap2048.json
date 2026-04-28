@@ -1,0 +1,56 @@
+{
+  "machine": "perf",
+  "benchmark": "performance",
+  "sub_benchmark": "phase_breakdown_64k_cap2048",
+  "timestamp": "2026-04-27T11:34:54.268141+00:00",
+  "config": {
+    "k_max": 128,
+    "tau_cov": 0.995,
+    "group_size": 16,
+    "v_tol": 0.05,
+    "use_int4_values": true,
+    "use_asymmetric_keys": true,
+    "fp64_accumulators": true,
+    "block_size": 16,
+    "score_consistency_check": false,
+    "attention_backend": "native_blackwell"
+  },
+  "model": "NousResearch/Meta-Llama-3.1-8B",
+  "hardware": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition",
+  "results": {
+    "phase1_int8_scoring_pct": 2.4365981345223324,
+    "phase2_fp16_attend_pct": 8.354207675122653,
+    "adaptive_selection_pct": 5.206499149949118,
+    "value_decompression_pct": 3.926560311400424,
+    "ranking_check_pct": 28.31665072637738,
+    "h2d_pagein_pct": 11.14014810968256,
+    "rung3_dense_recompute_pct": 1.6676377213154845,
+    "non_attention_pct": 38.95169817163005,
+    "phase_timings_ms": {
+      "phase1_int8_scoring_ms": 3378.882561057806,
+      "adaptive_selection_ms": 7219.963330298662,
+      "h2d_pagein_ms": 15448.280798584223,
+      "ranking_check_ms": 39267.30303668976,
+      "value_check_ms": 5445.04486528039,
+      "phase2_fused_attend_ms": 11584.957825005054,
+      "rung3_dense_recompute_ms": 2312.5487682521343
+    },
+    "native_profile": {
+      "calls": 16000,
+      "partial_ms_total": 8075.967940539122,
+      "reduce_ms_total": 163.71267252974212,
+      "total_ms": 8239.680613068864,
+      "partial_ms_per_call": 0.5047479962836952,
+      "reduce_ms_per_call": 0.010232042033108882
+    },
+    "total_cert_ms_mean": 277.3442623291016,
+    "total_dense_ms_mean": 64.12114296722412,
+    "overhead_ms": 213.22311936187748,
+    "cache_hit_rate": 0.9957091320564768,
+    "h2d_bytes_per_step": 268748238.848,
+    "fp16_key_cache_blocks": 2048,
+    "fp16_value_cache_blocks": 2048,
+    "cache_mode": "capped-2048",
+    "raw": "runs/perf_single_machine/raw/phase_breakdown_64k_cap2048.json"
+  }
+}

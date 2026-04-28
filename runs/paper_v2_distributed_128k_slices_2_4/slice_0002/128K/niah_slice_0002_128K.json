@@ -1,0 +1,208 @@
+{
+  "results": {
+    "dense": [
+      {
+        "context_tokens": 130842,
+        "target_context": 131072,
+        "depth": 0.0,
+        "needle_idx": 2,
+        "mode": "dense",
+        "correct": false,
+        "expected": "Zurich",
+        "generated": " The secret is the history of mathematics.\nExplanation: The history of mathematics spans thousands of years and encompasses many different cultures and civilizations. From the earliest counting system",
+        "trial_idx": 2
+      }
+    ],
+    "certified": [
+      {
+        "context_tokens": 130842,
+        "target_context": 131072,
+        "depth": 0.0,
+        "needle_idx": 2,
+        "mode": "certified",
+        "correct": false,
+        "expected": "Zurich",
+        "generated": " The secret is the history of mathematics.\nExplanation: The history of mathematics spans thousands of years and encompasses many different cultures and civilizations. From the earliest counting system",
+        "ranking_heads_total": 50176,
+        "ranking_disagree_r1": 196,
+        "ranking_disagree_r3": 2162,
+        "ranking_fallback_triggered": 2125,
+        "rung1_fired": true,
+        "rung2_fired": true,
+        "rung3_fired": true,
+        "rung4_fired": false,
+        "rung1_fired_layers": 1566,
+        "rung2_fired_layers": 1568,
+        "rung3_fired_layers": 841,
+        "rung4_fired_layers": 0,
+        "boundary_check_fired": true,
+        "boundary_check_fired_layers": 795,
+        "boundary_check_triggered_heads_total": 1968,
+        "e_key_step_mean": 0.5561760397038745,
+        "e_key_step_max": 9.459139823913574,
+        "v_max_global": 22.02968406677246,
+        "e_val_max": 0.05000000074505806,
+        "e_val_mean": 0.037408450610516356,
+        "e_val_pre_rung2_max": 0.09485437721014023,
+        "e_val_pre_rung2_mean": 0.07554778930902177,
+        "value_fallback_blocks": 310023,
+        "value_fallback_head_blocks": 824988,
+        "tail_mass_int8_est_step_mean": 0.08659941213661615,
+        "tail_mass_int8_est_step_max": 0.9314574599266052,
+        "k_star_mean": 226.91647401147958,
+        "k_star_max": 256,
+        "h2d_key_bytes": 0,
+        "h2d_value_bytes": 0,
+        "h2d_total_bytes": 0,
+        "vram_fp16_key_cache_bytes": 420248485888,
+        "vram_fp16_value_cache_bytes": 473520144384,
+        "fp16_value_cache_hits_step": 0,
+        "fp16_value_cache_misses_step": 0,
+        "fp16_value_cache_evictions_step": 0,
+        "fp16_value_cache_needed_blocks_step": 0,
+        "fp16_value_cache_overflow_step": 0,
+        "trial_idx": 2
+      }
+    ]
+  },
+  "heatmaps": {
+    "dense": {
+      "128K_d0.0": 0.0
+    },
+    "certified": {
+      "128K_d0.0": 0.0
+    }
+  },
+  "dense_accuracy": 0.0,
+  "certified_accuracy": 0.0,
+  "critical_failures": 0,
+  "paired_stats": {
+    "n": 1,
+    "dense_correct": 0,
+    "certified_correct": 0,
+    "dense_accuracy": 0.0,
+    "certified_accuracy": 0.0,
+    "delta_accuracy": 0.0,
+    "delta_pp": 0.0,
+    "bootstrap_ci_lo": 0.0,
+    "bootstrap_ci_hi": 0.0,
+    "bootstrap_ci_pp_lo": 0.0,
+    "bootstrap_ci_pp_hi": 0.0,
+    "bootstrap_iters": 10000,
+    "bootstrap_seed": 20260425,
+    "mcnemar_p": 1.0,
+    "mcnemar": {
+      "test": "exact_two_sided_binomial",
+      "p_value": 1.0,
+      "discordant": 0,
+      "dense_only": 0,
+      "certified_only": 0
+    },
+    "paired_table": {
+      "both_correct": 0,
+      "dense_only": 0,
+      "certified_only": 0,
+      "both_wrong": 1
+    }
+  },
+  "paired_stats_by_context": {
+    "128K": {
+      "n": 1,
+      "dense_correct": 0,
+      "certified_correct": 0,
+      "dense_accuracy": 0.0,
+      "certified_accuracy": 0.0,
+      "delta_accuracy": 0.0,
+      "delta_pp": 0.0,
+      "bootstrap_ci_lo": 0.0,
+      "bootstrap_ci_hi": 0.0,
+      "bootstrap_ci_pp_lo": 0.0,
+      "bootstrap_ci_pp_hi": 0.0,
+      "bootstrap_iters": 10000,
+      "bootstrap_seed": 20260425,
+      "mcnemar_p": 1.0,
+      "mcnemar": {
+        "test": "exact_two_sided_binomial",
+        "p_value": 1.0,
+        "discordant": 0,
+        "dense_only": 0,
+        "certified_only": 0
+      },
+      "paired_table": {
+        "both_correct": 0,
+        "dense_only": 0,
+        "certified_only": 0,
+        "both_wrong": 1
+      }
+    }
+  },
+  "paired_stats_by_needle_group": {
+    "original": {
+      "n": 1,
+      "dense_correct": 0,
+      "certified_correct": 0,
+      "dense_accuracy": 0.0,
+      "certified_accuracy": 0.0,
+      "delta_accuracy": 0.0,
+      "delta_pp": 0.0,
+      "bootstrap_ci_lo": 0.0,
+      "bootstrap_ci_hi": 0.0,
+      "bootstrap_ci_pp_lo": 0.0,
+      "bootstrap_ci_pp_hi": 0.0,
+      "bootstrap_iters": 10000,
+      "bootstrap_seed": 20260425,
+      "mcnemar_p": 1.0,
+      "mcnemar": {
+        "test": "exact_two_sided_binomial",
+        "p_value": 1.0,
+        "discordant": 0,
+        "dense_only": 0,
+        "certified_only": 0
+      },
+      "paired_table": {
+        "both_correct": 0,
+        "dense_only": 0,
+        "certified_only": 0,
+        "both_wrong": 1
+      }
+    }
+  },
+  "cache_config": {
+    "v_tolerance": 0.05,
+    "quantization_mode": "asymmetric_int8_keys+int4_g16_values",
+    "asymmetric_keys": true,
+    "use_int4_values": true,
+    "group_size": 16,
+    "score_consistency_check": false,
+    "tau_cov": 0.995,
+    "k_min": 2,
+    "k_max": 128,
+    "ranking_fallback": true,
+    "ranking_r": 1,
+    "ranking_fallback_mode": "full",
+    "fp16_key_cache_blocks": 9216,
+    "fp16_value_cache_blocks": 9216,
+    "eps_guard": 0.01,
+    "exploration_rate": 0.02,
+    "rung1_threshold": 0.02,
+    "rung1_multiplier": 2.0,
+    "attention_backend": "native_blackwell",
+    "static_resident_cache": "1",
+    "splitk_blocks_per_split": "auto_native_32_24_16",
+    "cuda_graph_decode": false,
+    "runtime_profile": "0",
+    "code_sha": "822f221e2c58bcf462fed8b63c829d66b1a2bfec-dirty",
+    "dotcache_config_hash": "2b44157bbb6e146b4ef9ba8ea1afb3fef34a03a994ab7f5bb34599407d6bfe39"
+  },
+  "ranking_fallback_summary": {
+    "mode": "full",
+    "r": 1,
+    "heads_total": 50176,
+    "disagree_r1": 196,
+    "disagree_r3": 2162,
+    "triggered": 2125,
+    "disagree_rate_r1": 0.00390625,
+    "disagree_rate_r3": 0.043088329081632654,
+    "fallback_rate": 0.04235092474489796
+  }
+}
