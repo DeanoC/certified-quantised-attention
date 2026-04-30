@@ -17,7 +17,6 @@
 \usepackage{titlesec}
 \usepackage{graphicx}
 \usepackage{float}
-\usepackage{dblfloatfix} % fixes float ordering for table* in twocolumn
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,fit,backgrounds,calc}
 
@@ -51,6 +50,12 @@
 \setlength{\parindent}{0pt}
 \titlespacing*{\section}{0pt}{12pt}{6pt}
 \titlespacing*{\subsection}{0pt}{8pt}{3pt}
+\raggedbottom
+\setlength{\emergencystretch}{2em}
+\hfuzz=2pt
+\vfuzz=2pt
+\hbadness=10000
+\vbadness=10000
 
 % ---- Notation ----
 \newcommand{\Kb}{\mathbf{K}}
@@ -59,7 +64,7 @@
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\norm}[1]{\lVert #1 \rVert}
 % breakable long identifier
-\newcommand{\torchsdpa}{\texttt{torch.scaled\_dot\_\hspace{0pt}product\_attention}}
+\newcommand{\torchsdpa}{\texttt{torch.scaled\_\hspace{0pt}dot\_\hspace{0pt}product\_\hspace{0pt}attention}}
 
 % =============================================================
 \begin{document}
@@ -72,9 +77,8 @@
   {\large\itshape Per-Head, Per-Step Error Bounds for Compressed KV Caches\\
   with Dense FP16 Fallback}\\[8pt]
   Dean Calver\\[2pt]
-  {\small Independent}\\[2pt]
-  {\small\ttfamily deano@cloudpixies.com}\\[4pt]
-  {\small\color{gray} April 2026}
+  {\small Independent Researcher}\\[2pt]
+  {\small\ttfamily deano@cloudpixies.com}
 \end{center}
 
 \vspace{4pt}
@@ -87,7 +91,7 @@ KV cache quantisation reduces the memory cost of long-context LLM inference, but
 
 We present a tiered KV cache that stores INT8 keys and INT4 values in GPU memory while retaining FP16 originals in system RAM\@.  A two-term error decomposition provides per-head, per-step runtime bounds on key and value compression error.  For each head and decode step, the system either returns a quantised result with a computed bound relative to the same kernel run with FP16 KV, or escalates to the dense code path with unmodified FP16 KV\@.  The certificate is local to each attention call; end-to-end task quality is evaluated empirically.
 
-On LLaMA~3.1-8B with INT8 model weights across 8K--128K contexts (both systems differ only in KV cache), the certified system matches dense FP16-KV perplexity within noise on PG-19 ($\Delta\mathrm{ppl}{=}{-}0.002$ to ${+}0.001$, 95\% CIs including zero).  NIAH paired trials show no significant degradation at 8K, 32K, or 64K (exact McNemar $p{\geq}0.727$; 100 trials each).  RULER matches or exceeds dense at 64K ($+1.5$pp) and 128K ($+0.4$pp); gaps of $-6.9$pp at 8K and $-1.9$pp at 32K are localised to value-sensitive subtasks and closed by FP16-value ablation or tighter $v_{\mathrm{tol}}$.  A naive baseline with identical quantisation but no certification catastrophically degrades retrieval (NIAH 5--10\% vs.\ 39--66\% dense) and RULER ($-44$ to $-56$pp), confirming that the fallback machinery drives quality recovery.  Certification adds $2.7\text{--}4.8\times$ decode latency versus dense Flash Attention; with asymmetric scratch caches, VRAM savings reach 17\% at 64K and 28\% at 128K, at the cost of retaining the full FP16 KV cache in system RAM for fallback.  No retraining or offline calibration data is required (per-channel scales are computed online at block-fill time).
+On LLaMA~3.1-8B with INT8 model weights across 8K--128K contexts (both systems differ only in KV cache), the certified system matches dense FP16-KV perplexity on PG-19 within measurement noise and shows no statistically significant degradation on NIAH at 8K, 32K, or 64K.  On RULER, it matches or exceeds dense at 64K and 128K; the remaining short-context gaps at 8K and 32K are concentrated in value-sensitive subtasks and are reduced by FP16-value ablations or tighter $v_{\mathrm{tol}}$.  A baseline with the same quantisation but no certification incurs large retrieval and reasoning losses, indicating that the fallback machinery is central to quality recovery.  Certification increases decode latency by $2.7\text{--}4.8\times$ versus dense Flash Attention; with asymmetric scratch caches, VRAM savings reach 17\% at 64K and 28\% at 128K, while the full FP16 KV cache remains in system RAM for fallback.  No retraining or offline calibration data is required.
 \end{abstract}
 
 \vspace{4pt}
@@ -103,13 +107,13 @@ Autoregressive LLM decoding at long context lengths is dominated by the cost of 
 
 KV cache quantisation~\cite{kvquant,kivi,qjl,innerq} addresses this by storing keys and values in reduced-precision formats---typically INT8, INT4, or lower.  The savings are substantial: an INT8 cache halves memory usage, and INT4 quarters it.  But quantisation introduces error, and the relationship between quantisation parameters and output quality is complex.  The same quantisation scheme that works well on one prompt may fail on another, depending on the attention pattern, the key/value distributions, and the specific tokens being attended to.
 
-The standard response is empirical validation: run a benchmark suite, check that perplexity doesn't degrade beyond a threshold, and deploy.  This works in practice but provides no per-step guarantee.  A system that achieves $\Delta\text{ppl} < 0.1$ on average may produce arbitrarily bad outputs on individual decode steps---and there is no mechanism to detect when this happens, let alone recover from it.
+The standard response is empirical validation: run a benchmark suite, check that perplexity doesn't degrade beyond a threshold, and deploy.  This works in practice but provides no per-step guarantee.  A system that achieves $\Delta\text{ppl} < 0.1$ on average may still exhibit large step-wise deviations on individual decode steps---and there is no mechanism to detect when this happens, let alone recover from it.
 
 KV cache quantisation and compressed-domain attention are well-established techniques.  What is missing is a \emph{guarantee}: a way to bound, at each decode step, how far the quantised output deviates from an unquantised reference---and a way to recover the production dense output when the bound is too large.\footnote{The paper distinguishes three reference outputs: $O_{\mathrm{dense}}$ (production Dense baseline via \torchsdpa{}), $O_{\mathrm{ref}}$ (same certified kernel with unquantised FP16 KV), and $O_{\mathrm{quant}}$ (certified kernel with quantised KV).  The formal bounds (Section~\ref{sec:bounds}) certify $\norm{O_{\mathrm{quant}} - O_{\mathrm{ref}}}$; the arithmetic-path gap $\norm{O_{\mathrm{ref}} - O_{\mathrm{dense}}}$ is characterised in Section~\ref{sec:numerical}.  On fallback, the system returns $O_{\mathrm{dense}}$ directly.}
 
-This paper provides that guarantee.  The key ideas are:
+This paper develops such a guarantee together with a practical recovery mechanism.  The key ideas are:
 
-\textbf{1.\ Tiered storage with unconditional fallback.}  Quantised keys and values live in GPU memory; full-precision originals live in pinned system RAM\@.  The FP16 data is not discarded after quantisation---it is retained as a safety net.  Any block can be escalated to full precision at any time, at the cost of a host-to-device page-in from system RAM (overlappable with GPU compute).  The worst case is the same \torchsdpa{} code path and FP16 KV inputs used by the Dense baseline, not a degraded approximation.  Fallback is unconditional in correctness, not cost: it requires transient staging memory for one layer's KV and host-to-device bandwidth for the page-in, but never requires the full dense cache to be persistently resident in VRAM (Section~\ref{sec:fallback}).
+\textbf{1.\ Tiered storage with dense fallback.}  Quantised keys and values live in GPU memory; full-precision originals live in pinned system RAM\@.  The FP16 data is not discarded after quantisation---it is retained as a safety net.  Any block can be escalated to full precision at any time, at the cost of a host-to-device page-in from system RAM (overlappable with GPU compute).  The terminal fallback path uses the same \torchsdpa{} code path and FP16 KV inputs as the Dense baseline.  This fallback is unconditional in correctness, though not in cost: it requires transient staging memory for one layer's KV and host-to-device bandwidth for the page-in, but never requires the full dense cache to be persistently resident in VRAM (Section~\ref{sec:fallback}).
 
 \textbf{2.\ Formal error bounds with runtime monitoring.}  A two-term error decomposition bounds the output perturbation from key compression and value compression independently.  The key compression error depends on how quantisation shifts the softmax distribution; the value compression error depends on the per-token reconstruction quality.  Both bounds are computable at runtime from quantities the system already tracks (quantisation scales, query norms, value ranges), enabling per-head, per-step precision decisions.
 
@@ -236,7 +240,7 @@ The per-channel scales and offsets are \emph{per-block}: each block of $B$ token
 
 \textbf{Per-group INT4 values.}  Each value vector of dimension $d$ is divided into groups of $g$ elements (default $g = 16$).  Each group is independently quantised to INT4 with its own FP16 scale and real-valued offset.  Two INT4 values are packed into a single byte.
 
-Per-group granularity is necessary for values because value vectors exhibit higher intra-vector dynamic range variation than keys.  A single scale for the full $d{=}128$ vector would crush groups with small magnitudes.  The group size $g$ controls a quality--storage tradeoff: smaller groups provide finer-grained quantisation at the cost of more metadata.  Empirically, $g{=}16$ achieves near-lossless \emph{perplexity} ($\Delta\text{ppl} = +0.03$) with zero fallback escalation at the default tolerance; however, value-sensitive tasks such as variable tracking and word extraction show measurable degradation at short contexts (Section~\ref{sec:ruler_8k_ablation}).  Smaller groups ($g{=}4, 8$) give the same quality but worse storage; larger groups ($g{=}32$) save marginally more memory but degrade catastrophically (Section~\ref{sec:results}).
+Per-group granularity is necessary for values because value vectors exhibit higher intra-vector dynamic range variation than keys.  A single scale for the full $d{=}128$ vector would crush groups with small magnitudes.  The group size $g$ controls a quality--storage tradeoff: smaller groups provide finer-grained quantisation at the cost of more metadata.  Empirically, $g{=}16$ achieves near-lossless \emph{perplexity} ($\Delta\text{ppl} = +0.03$) with zero fallback escalation at the default tolerance; however, value-sensitive tasks such as variable tracking and word extraction show measurable degradation at short contexts (Section~\ref{sec:ruler_8k_ablation}).  Smaller groups ($g{=}4, 8$) give the same quality but worse storage; larger groups ($g{=}32$) save marginally more memory but degrade sharply (Section~\ref{sec:results}).
 
 The storage cost is $d/2$ bytes per token for the quantised values (INT4 packed), plus $2 \times (d/g) \times 2$ bytes per token for FP16 scales and offsets.  For $d{=}128$ and $g{=}16$: 64 bytes (values) + 32 bytes (metadata) = 96 bytes per token, compared to 256 bytes for FP16.  This is 37.5\% of FP16.
 
@@ -802,14 +806,14 @@ RULER & $\Delta$ accuracy & $-0.069$ & $-0.019$ & $+0.015$ & $+0.004$ & 20 slice
 
 To isolate the contribution of the certification and fallback machinery, we evaluate a \textbf{naive INT8K/INT4V} baseline: the same quantisation format (INT8 per-channel keys, INT4 $g{=}16$ values) but with all certification disabled---no adaptive top-$K$ promotion ($K_{\max}{=}0$, $\tau_{\mathrm{cov}}{=}0$), no value promotion ($v_{\mathrm{tol}}$ effectively infinite), no ranking-consistency check, no fallback ladder, and no FP16 scratch cache.  The model and prompts are identical.
 
-Table~\ref{tab:naive} shows the three-way comparison.  Without certification, INT8K/INT4V quantisation catastrophically degrades retrieval and structured reasoning.  On standalone NIAH (100 paired trials per context length), naive accuracy drops to 5--10\% versus 39--66\% for dense, with McNemar $p < 10^{-9}$ at every context length.  The certified system matches dense at all three.  On RULER (10 slices, 70 trials per context length), naive RULER drops by $-44$ to $-56$pp across all context lengths, with every subtask affected: VT scores 0\% at every context length, CWE drops to near-zero, and even NIAH retrieval variants within RULER lose $-20$ to $-78$pp.  The certified system recovers nearly all of this, with a worst-case gap of $-6.9$pp at 8K localised to value-sensitive subtasks.
+Table~\ref{tab:naive} shows the three-way comparison.  Without certification, INT8K/INT4V quantisation degrades retrieval and structured reasoning substantially.  On standalone NIAH (100 paired trials per context length), naive accuracy drops to 5--10\% versus 39--66\% for dense, with McNemar $p < 10^{-9}$ at every context length.  The certified system matches dense at all three.  On RULER (10 slices, 70 trials per context length), naive RULER drops by $-44$ to $-56$pp across all context lengths, with every subtask affected: VT scores 0\% at every context length, CWE drops to near-zero, and even NIAH retrieval variants within RULER lose $-20$ to $-78$pp.  The certified system recovers nearly all of this, with a worst-case gap of $-6.9$pp at 8K localised to value-sensitive subtasks.
 
 \begin{table}[ht]
 \centering
 \caption{Three-way quality comparison: Dense FP16 KV, Naive INT8K/INT4V (no certification), and Certified INT8K/INT4V (with adaptive promotion and fallback).  NIAH accuracy is the fraction of needles retrieved (10 per trial, 100 paired trials).  RULER accuracy is the subtask-averaged score; naive uses 10 slices (70 trials), certified uses 20 slices (140 trials)---the two are \emph{not} paired on the same slices, so the comparison is approximate.  The Dense column reports the dense score over the \emph{naive} 10-slice sample (e.g.\ 8K Dense 0.923 here vs.\ 0.908 in Table~\ref{tab:ruler}'s 20-slice sample); the difference is sampling variation.  Latency: mean decode step at the 2048-block scratch-cache operating point for certified; naive uses no scratch cache.}
 \label{tab:naive}
 \small
-\begin{tabular}{llrrr}
+\begin{tabular}{@{}llrrr@{}}
 \toprule
 \textbf{Benchmark} & \textbf{Ctx} & \textbf{Dense} & \textbf{Naive} & \textbf{Certified} \\
 \midrule
@@ -1428,7 +1432,7 @@ For language modelling, this difference is negligible---it vanishes into the per
 
 All quality results in this paper use FP32 online-softmax accumulators.  A development experiment with FP64 scalar accumulators ($m$, $\ell$ in FP64, output accumulator $o$ in FP32) recovered $\sim$2pp on NIAH 8K (Table~\ref{tab:niah_ablation}), but the FP32 path was sufficient for all reported quality metrics and is what the retained run artifacts use.  FP64 scalar accumulation remains available as an option for deployments where the arithmetic-path gap is a concern.
 
-The remaining $\sim$4pp gap is attributable to differences in the matmul path (certified kernel vs.\ Flash Attention tensor cores), not the quantisation scheme.  A tensor-core-native certified kernel that matched Flash Attention's rounding would be expected to reduce this gap, though the magnitude of any residual is unknown without implementation.  This does not affect the certification guarantee: Rung~3/4 fallbacks bypass the certified kernel entirely and call \torchsdpa{} (Section~\ref{sec:fallback}).
+The remaining $\sim$4pp gap is attributable to differences in the matmul path (certified kernel vs.\ Flash Attention tensor cores), not the quantisation scheme.  A tensor-core-native certified kernel that matched Flash Attention's rounding may reduce this gap, though the magnitude of any residual is unknown without implementation.  This does not affect the certification guarantee: Rung~3/4 fallbacks bypass the certified kernel entirely and call \torchsdpa{} (Section~\ref{sec:fallback}).
 
 
 % =============================================================
@@ -1470,22 +1474,22 @@ The system RAM requirement for Tier~2 (FP16 originals) equals the dense KV cache
 
 At a realistic 2048-block scratch cache, the runtime overhead ranges from $2.7\times$ (8K) to $4.8\times$ (128K) dense latency (Table~\ref{tab:context_scaling}).  The dominant overhead components are the ranking-consistency check (28\% of step time at 64K) and H2D page-in (11\%), both amenable to optimisation (Section~\ref{sec:performance}).  VRAM savings materialise at 64K+ context when cache capacity is tuned: with symmetric caches, a 1536-block cache at 64K achieves ${\sim}0.94\times$ dense; with an asymmetric cache (2048 key / 256 value blocks, Table~\ref{tab:asymmetric_cache}), 64K drops to ${\sim}0.83\times$ dense with negligible latency impact.  At 128K, the asymmetric knee is 512 value blocks: 2048K/512V matches symmetric 2048/2048 latency while reducing scratch by 37\%; below 512 blocks the split-$K$ value fallback becomes expensive (Section~\ref{sec:performance}).  Below 64K the scratch allocation exceeds dense VRAM regardless of capacity.
 
-The certified attention kernel uses a different computational path from Flash Attention, producing slightly different rounding (Section~\ref{sec:numerical}).  The development-time ablation (Table~\ref{tab:niah_ablation}) attributes $\sim$4pp to this kernel path; however, the 64K evaluation (100 paired trials, exact McNemar $p{=}1.0$) shows no statistically significant aggregate effect at the operating point.  A tensor-core-native kernel that matched Flash Attention's rounding would be expected to reduce this variance, though the magnitude of any residual is unknown without implementation.
+The certified attention kernel uses a different computational path from Flash Attention, producing slightly different rounding (Section~\ref{sec:numerical}).  The development-time ablation (Table~\ref{tab:niah_ablation}) attributes $\sim$4pp to this kernel path; however, the 64K evaluation (100 paired trials, exact McNemar $p{=}1.0$) shows no statistically significant aggregate effect at the operating point.  A tensor-core-native kernel that matched Flash Attention's rounding may reduce this variance, though the magnitude of any residual is unknown without implementation.
 
-The value group-size cliff between $g{=}16$ (near-lossless on perplexity) and $g{=}32$ (catastrophic, $+26.4$ $\Delta$ppl) means there is no intermediate operating point for INT4 values at $d{=}128$.  The RULER ablations (Section~\ref{sec:ruler_8k_ablation}) demonstrate that even $g{=}16$ introduces measurable degradation on value-sensitive subtasks at short contexts, though this effect diminishes with context length (mild CWE residual at 32K, undetectable at 64K+).  At both 8K and 32K, FP16-value ablations close the gap, and tightening $v_{\mathrm{tol}}$ to 0.02 at 32K removes the gap in a targeted ablation (5 slices), confirming the mechanism and providing a deployment knob.  Deployments requiring finer-grained value compression tradeoffs would need INT8 values (not currently implemented in the kernel) or a different head dimension.
+The value group-size cliff between $g{=}16$ (near-lossless on perplexity) and $g{=}32$ (severe, $+26.4$ $\Delta$ppl) means there is no intermediate operating point for INT4 values at $d{=}128$.  The RULER ablations (Section~\ref{sec:ruler_8k_ablation}) demonstrate that even $g{=}16$ introduces measurable degradation on value-sensitive subtasks at short contexts, though this effect diminishes with context length (mild CWE residual at 32K, undetectable at 64K+).  At both 8K and 32K, FP16-value ablations close the gap, and tightening $v_{\mathrm{tol}}$ to 0.02 at 32K removes the gap in a targeted ablation (5 slices), confirming the mechanism and providing a deployment knob.  Deployments requiring finer-grained value compression tradeoffs would need INT8 values (not currently implemented in the kernel) or a different head dimension.
 
 
 % =============================================================
 \section{Conclusion}
 \label{sec:conclusion}
 
-We presented a tiered KV cache architecture that stores INT8 keys and INT4 values in GPU memory (Tier-1: 56\% of FP16; runtime VRAM includes an additional FP16 key scratch buffer sized by the GQA working-set union) while retaining full-precision originals in system RAM (Tier-2) for runtime fallback.  A two-term error decomposition provides independent, per-head, per-step bounds on key compression error and value compression error, each with its own runtime monitor and escalation path.  An adaptive top-$K$ precision selector promotes high-mass blocks to FP16 keys based on the actual attention pattern at each decode step, and a four-rung fallback ladder ensures that the worst case is the Dense baseline's own \torchsdpa{} code path with unmodified FP16 KV, not a degraded approximation.
+We presented a tiered KV cache architecture that stores INT8 keys and INT4 values in GPU memory (Tier-1: 56\% of FP16; runtime VRAM includes an additional FP16 key scratch buffer sized by the GQA working-set union) while retaining full-precision originals in system RAM (Tier-2) for runtime fallback.  A two-term error decomposition provides independent, per-head, per-step bounds on key compression error and value compression error, each with its own runtime monitor and escalation path.  An adaptive top-$K$ precision selector promotes high-mass blocks to FP16 keys based on the actual attention pattern at each decode step, and a four-rung fallback ladder terminates in the Dense baseline's own \torchsdpa{} code path with unmodified FP16 KV.
 
 The system introduces a ranking-consistency check that detects when INT8 scoring noise distorts the attention distribution and triggers per-head fallback to dense attention.  This mechanism addresses a non-obvious failure mode we identified during evaluation: on retrieval-adversarial benchmarks, non-uniform precision across the sequence can cause attention dilution that degrades accuracy even when per-step error bounds are satisfied.
 
-On language modelling (PG-19), the certified system matches dense perplexity within measurement noise across all tested context lengths (8K--128K): $\Delta\mathrm{ppl}$ ranges from $-0.002$ to $+0.001$ with 95\% CIs including zero at every context length.  On structured long-context tasks (RULER, 7 subtasks), the certified system matches dense at 64K ($+0.015$, 20 slices) and 128K ($+0.004$, 20 slices), with the four RULER NIAH retrieval variants at or near dense performance across context lengths and no systematic retrieval degradation.  At 32K, a mild $-1.9$pp gap driven by CWE emerges (20 slices, 95\% CI nearly excludes zero); at 8K, a $-6.9$pp RULER gap is localised to three value-sensitive subtasks (VT, CWE, FWE) and is strongly consistent with INT4 value reconstruction error as the dominant mechanism---FP16-value ablations close the gap at both context lengths (8K to $-0.4$pp with 0 critical failures, 32K to $-0.5$pp), and tightening $v_{\mathrm{tol}}$ to 0.02 at 32K removes the gap in a targeted ablation (Section~\ref{sec:ruler_8k_ablation}).  On multi-needle retrieval (NIAH, 10 needles per trial, 100 paired trials each at 8K, 32K, 64K), no context length shows a statistically significant difference: exact McNemar $p{=}1.0$ at 8K, $p{=}0.727$ at 32K, and $p{=}1.0$ at 64K.  We observe and transparently report a residual kernel-path gap attributable to numerical precision differences between the certified kernel and Flash Attention, which is a property of the kernel implementation rather than the quantisation scheme.  The ranking-consistency check recovers the majority of this gap; a tensor-core-native kernel that matched Flash Attention's rounding would be expected to reduce the remainder, though the magnitude of any residual is unknown without implementation.
+On language modelling (PG-19), the certified system matches dense perplexity within measurement noise across all tested context lengths (8K--128K): $\Delta\mathrm{ppl}$ ranges from $-0.002$ to $+0.001$ with 95\% CIs including zero at every context length.  On structured long-context tasks (RULER, 7 subtasks), the certified system matches dense at 64K ($+0.015$, 20 slices) and 128K ($+0.004$, 20 slices), with the four RULER NIAH retrieval variants at or near dense performance across context lengths.  At 32K, a mild $-1.9$pp gap driven by CWE emerges (20 slices, 95\% CI nearly excludes zero); at 8K, a $-6.9$pp RULER gap is localised to three value-sensitive subtasks (VT, CWE, FWE) and is strongly consistent with INT4 value reconstruction error as the dominant mechanism---FP16-value ablations close the gap at both context lengths (8K to $-0.4$pp with 0 critical failures, 32K to $-0.5$pp), and tightening $v_{\mathrm{tol}}$ to 0.02 at 32K removes the gap in a targeted ablation (Section~\ref{sec:ruler_8k_ablation}).  On multi-needle retrieval (NIAH, 10 needles per trial, 100 paired trials each at 8K, 32K, 64K), no context length shows a statistically significant difference: exact McNemar $p{=}1.0$ at 8K, $p{=}0.727$ at 32K, and $p{=}1.0$ at 64K.  We observe and transparently report a residual kernel-path gap attributable to numerical precision differences between the certified kernel and Flash Attention, which is a property of the kernel implementation rather than the quantisation scheme.  The ranking-consistency check recovers the majority of this gap; a tensor-core-native kernel that matched Flash Attention's rounding may reduce the remainder, though the magnitude of any residual is unknown without implementation.
 
-A naive INT8K/INT4V baseline---identical quantisation but with all certification and fallback disabled---catastrophically degrades retrieval (NIAH accuracy drops to 5--10\% vs.\ 39--66\% dense) and structured reasoning (RULER $-44$ to $-56$pp at all context lengths, VT 0\% everywhere).  The certified system recovers nearly all of this loss, demonstrating that the certification and fallback machinery is not monitoring overhead but the mechanism by which the system preserves quality under aggressive quantisation (Section~\ref{sec:naive}).
+A naive INT8K/INT4V baseline---identical quantisation but with all certification and fallback disabled---substantially degrades retrieval (NIAH accuracy drops to 5--10\% vs.\ 39--66\% dense) and structured reasoning (RULER $-44$ to $-56$pp at all context lengths, VT 0\% everywhere).  The certified system recovers nearly all of this loss, indicating that the certification and fallback machinery is not merely monitoring overhead, but a primary mechanism by which the system preserves quality under aggressive quantisation (Section~\ref{sec:naive}).
 
 At a realistic 2048-block scratch cache, the certified system runs at $2.7\text{--}4.8\times$ the latency of dense Flash Attention across 8K--128K context (Table~\ref{tab:context_scaling}), with the overhead dominated by the ranking-consistency check and H2D page-in.  The kernel overhead is an implementation artefact independent of the error bounds; the remaining overhead is amenable to fusion and caching optimisations (Section~\ref{sec:performance}).  Meaningful VRAM savings materialise at 64K+ when scratch capacity is tuned: ${\sim}0.83\times$ dense at 64K with an asymmetric 2048K/256V cache, or ${\sim}0.72\times$ at 128K with 2048K/512V---both at no latency cost relative to symmetric caches (Table~\ref{tab:asymmetric_cache}).
 
@@ -1702,7 +1706,11 @@ where the last step uses $(1 - e^{-2\Delta}) = (e^{2\Delta}-1)e^{-2\Delta}$ and 
 
 Computing the TV at this vertex:
 \begin{align*}
-  \mathrm{TV} &= \sum_{t \in \mathcal{S}^+} a_t(e^{2\Delta} - 1) = p\,(e^{2\Delta} - 1) = \frac{e^{2\Delta} - 1}{e^{2\Delta} + 1} = \tanh(\Delta)
+  \mathrm{TV}
+  &= \sum_{t \in \mathcal{S}^+} a_t(e^{2\Delta} - 1)
+   = p\,(e^{2\Delta} - 1) \\
+  &= \frac{e^{2\Delta} - 1}{e^{2\Delta} + 1}
+   = \tanh(\Delta)
 \end{align*}
 
 This bound is tight (attained by the above construction), independent of $N$, and for small $\Delta$ satisfies $\tanh(\Delta) \approx \Delta$.
@@ -1761,10 +1769,11 @@ Since $|1 - r| \leq \max(e^{2\Delta} - 1, 1 - e^{-2\Delta}) = e^{2\Delta} - 1$ f
 \end{align}
 
 \emph{Combining.}  Adding \eqref{eq:fp16_contrib} and \eqref{eq:tail_contrib}:
-\[
-  \sum_t |a_t - a_t'| \leq \alpha_{\mathcal{T}}(e^{\Delta} - 1) + \alpha_{\mathcal{T}}(e^{2\Delta} - 1)
-  = \alpha_{\mathcal{T}}(e^{2\Delta} + e^{\Delta} - 2)
-\]
+\begin{align*}
+  \sum_t |a_t - a_t'|
+  &\leq \alpha_{\mathcal{T}}\bigl((e^{\Delta} - 1) + (e^{2\Delta} - 1)\bigr) \\
+  &= \alpha_{\mathcal{T}}\bigl(e^{2\Delta} + e^{\Delta} - 2\bigr)
+\end{align*}
 Since $e^{\Delta} \leq e^{2\Delta}$ for all $\Delta \geq 0$, we have $e^{2\Delta} + e^{\Delta} - 2 \leq 2(e^{2\Delta} - 1)$, and therefore:
 \[
   \mathrm{TV}(a, a') = \tfrac{1}{2}\sum_t |a_t - a_t'| \leq \alpha_{\mathcal{T}} \cdot (e^{2\Delta} - 1)
