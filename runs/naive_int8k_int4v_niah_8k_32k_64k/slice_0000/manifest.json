@@ -1,0 +1,117 @@
+{
+  "slice_id": 0,
+  "mode": "line",
+  "model": "NousResearch/Meta-Llama-3.1-8B",
+  "cache_mode": "full-bounded",
+  "cert_profile": "naive-int8k-int4v",
+  "niah_trials_per_slice": 100,
+  "created": "2026-04-28T12:06:19.044682+00:00",
+  "provenance": {
+    "host": "4667d6a9aff1",
+    "cwd": "/workspace/DotCache",
+    "python": "/workspace/DotCache/.venv/bin/python",
+    "git_commit": "caf2efd2371d9c5178042f40b275d2c73c08a950",
+    "git_branch": "port-to-paper-20260424",
+    "git_dirty": true
+  },
+  "jobs": [
+    {
+      "slice_id": 0,
+      "benchmark": "niah",
+      "context_length": 8192,
+      "output": "runs/naive_int8k_int4v_niah_8k_32k_64k/slice_0000/8K/niah_slice_0000_8K.json",
+      "log": "runs/naive_int8k_int4v_niah_8k_32k_64k/slice_0000/8K/niah_slice_0000_8K.log",
+      "command_string": "/workspace/DotCache/.venv/bin/python /workspace/DotCache/benchmarks/paper/niah.py --contexts 8192 --needles 10 --trial-start 0 --trial-count 100 --output runs/naive_int8k_int4v_niah_8k_32k_64k/slice_0000/8K/niah_slice_0000_8K.json --model NousResearch/Meta-Llama-3.1-8B --cert-profile naive-int8k-int4v --v-tolerance 1000000000.0 --use-int4-values --group-size 16 --tau-cov 0 --k-min 0 --k-max 0 --eps-guard 0.01 --exploration-rate 0.0 --rung1-threshold 1.0 --rung1-multiplier 1.0 --fp16-key-cache-blocks 0 --fp16-value-cache-blocks 0 --top-k-fp16 0",
+      "cache_mode": "full-bounded",
+      "cert_profile": "naive-int8k-int4v",
+      "recommended_v2_cache_blocks": [
+        448,
+        192
+      ]
+    },
+    {
+      "slice_id": 0,
+      "benchmark": "niah",
+      "context_length": 32768,
+      "output": "runs/naive_int8k_int4v_niah_8k_32k_64k/slice_0000/32K/niah_slice_0000_32K.json",
+      "log": "runs/naive_int8k_int4v_niah_8k_32k_64k/slice_0000/32K/niah_slice_0000_32K.log",
+      "command_string": "/workspace/DotCache/.venv/bin/python /workspace/DotCache/benchmarks/paper/niah.py --contexts 32768 --needles 10 --trial-start 0 --trial-count 100 --output runs/naive_int8k_int4v_niah_8k_32k_64k/slice_0000/32K/niah_slice_0000_32K.json --model NousResearch/Meta-Llama-3.1-8B --cert-profile naive-int8k-int4v --v-tolerance 1000000000.0 --use-int4-values --group-size 16 --tau-cov 0 --k-min 0 --k-max 0 --eps-guard 0.01 --exploration-rate 0.0 --rung1-threshold 1.0 --rung1-multiplier 1.0 --fp16-key-cache-blocks 0 --fp16-value-cache-blocks 0 --top-k-fp16 0",
+      "cache_mode": "full-bounded",
+      "cert_profile": "naive-int8k-int4v",
+      "recommended_v2_cache_blocks": [
+        1792,
+        768
+      ]
+    },
+    {
+      "slice_id": 0,
+      "benchmark": "niah",
+      "context_length": 65536,
+      "output": "runs/naive_int8k_int4v_niah_8k_32k_64k/slice_0000/64K/niah_slice_0000_64K.json",
+      "log": "runs/naive_int8k_int4v_niah_8k_32k_64k/slice_0000/64K/niah_slice_0000_64K.log",
+      "command_string": "/workspace/DotCache/.venv/bin/python /workspace/DotCache/benchmarks/paper/niah.py --contexts 65536 --needles 10 --trial-start 0 --trial-count 100 --output runs/naive_int8k_int4v_niah_8k_32k_64k/slice_0000/64K/niah_slice_0000_64K.json --model NousResearch/Meta-Llama-3.1-8B --cert-profile naive-int8k-int4v --v-tolerance 1000000000.0 --use-int4-values --group-size 16 --tau-cov 0 --k-min 0 --k-max 0 --eps-guard 0.01 --exploration-rate 0.0 --rung1-threshold 1.0 --rung1-multiplier 1.0 --fp16-key-cache-blocks 0 --fp16-value-cache-blocks 0 --top-k-fp16 0",
+      "cache_mode": "full-bounded",
+      "cert_profile": "naive-int8k-int4v",
+      "recommended_v2_cache_blocks": [
+        3584,
+        1536
+      ]
+    }
+  ],
+  "completed": [
+    {
+      "slice_id": 0,
+      "benchmark": "niah",
+      "context_length": 8192,
+      "output": "runs/naive_int8k_int4v_niah_8k_32k_64k/slice_0000/8K/niah_slice_0000_8K.json",
+      "log": "runs/naive_int8k_int4v_niah_8k_32k_64k/slice_0000/8K/niah_slice_0000_8K.log",
+      "command_string": "/workspace/DotCache/.venv/bin/python /workspace/DotCache/benchmarks/paper/niah.py --contexts 8192 --needles 10 --trial-start 0 --trial-count 100 --output runs/naive_int8k_int4v_niah_8k_32k_64k/slice_0000/8K/niah_slice_0000_8K.json --model NousResearch/Meta-Llama-3.1-8B --cert-profile naive-int8k-int4v --v-tolerance 1000000000.0 --use-int4-values --group-size 16 --tau-cov 0 --k-min 0 --k-max 0 --eps-guard 0.01 --exploration-rate 0.0 --rung1-threshold 1.0 --rung1-multiplier 1.0 --fp16-key-cache-blocks 0 --fp16-value-cache-blocks 0 --top-k-fp16 0",
+      "cache_mode": "full-bounded",
+      "cert_profile": "naive-int8k-int4v",
+      "recommended_v2_cache_blocks": [
+        448,
+        192
+      ],
+      "started": "2026-04-28T12:06:19.146955+00:00",
+      "ended": "2026-04-28T12:23:26.737056+00:00",
+      "wall_seconds": 1027.5900425049476,
+      "exit_code": 0
+    },
+    {
+      "slice_id": 0,
+      "benchmark": "niah",
+      "context_length": 32768,
+      "output": "runs/naive_int8k_int4v_niah_8k_32k_64k/slice_0000/32K/niah_slice_0000_32K.json",
+      "log": "runs/naive_int8k_int4v_niah_8k_32k_64k/slice_0000/32K/niah_slice_0000_32K.log",
+      "command_string": "/workspace/DotCache/.venv/bin/python /workspace/DotCache/benchmarks/paper/niah.py --contexts 32768 --needles 10 --trial-start 0 --trial-count 100 --output runs/naive_int8k_int4v_niah_8k_32k_64k/slice_0000/32K/niah_slice_0000_32K.json --model NousResearch/Meta-Llama-3.1-8B --cert-profile naive-int8k-int4v --v-tolerance 1000000000.0 --use-int4-values --group-size 16 --tau-cov 0 --k-min 0 --k-max 0 --eps-guard 0.01 --exploration-rate 0.0 --rung1-threshold 1.0 --rung1-multiplier 1.0 --fp16-key-cache-blocks 0 --fp16-value-cache-blocks 0 --top-k-fp16 0",
+      "cache_mode": "full-bounded",
+      "cert_profile": "naive-int8k-int4v",
+      "recommended_v2_cache_blocks": [
+        1792,
+        768
+      ],
+      "started": "2026-04-28T12:23:26.737510+00:00",
+      "ended": "2026-04-28T13:06:54.990107+00:00",
+      "wall_seconds": 2608.2525538709015,
+      "exit_code": 0
+    },
+    {
+      "slice_id": 0,
+      "benchmark": "niah",
+      "context_length": 65536,
+      "output": "runs/naive_int8k_int4v_niah_8k_32k_64k/slice_0000/64K/niah_slice_0000_64K.json",
+      "log": "runs/naive_int8k_int4v_niah_8k_32k_64k/slice_0000/64K/niah_slice_0000_64K.log",
+      "command_string": "/workspace/DotCache/.venv/bin/python /workspace/DotCache/benchmarks/paper/niah.py --contexts 65536 --needles 10 --trial-start 0 --trial-count 100 --output runs/naive_int8k_int4v_niah_8k_32k_64k/slice_0000/64K/niah_slice_0000_64K.json --model NousResearch/Meta-Llama-3.1-8B --cert-profile naive-int8k-int4v --v-tolerance 1000000000.0 --use-int4-values --group-size 16 --tau-cov 0 --k-min 0 --k-max 0 --eps-guard 0.01 --exploration-rate 0.0 --rung1-threshold 1.0 --rung1-multiplier 1.0 --fp16-key-cache-blocks 0 --fp16-value-cache-blocks 0 --top-k-fp16 0",
+      "cache_mode": "full-bounded",
+      "cert_profile": "naive-int8k-int4v",
+      "recommended_v2_cache_blocks": [
+        3584,
+        1536
+      ],
+      "started": "2026-04-28T13:06:54.990528+00:00",
+      "ended": "2026-04-28T14:35:50.908900+00:00",
+      "wall_seconds": 5335.918334059417,
+      "exit_code": 0
+    }
+  ]
+}

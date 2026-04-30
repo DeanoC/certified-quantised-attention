@@ -1,18 +1,20 @@
 # Certified Quantised Attention
 
-Reviewer-facing extraction for the paper in
-`paper/Certified_Quantised_Attention.tex`.
+Reviewer-facing artifact for the paper in
+`paper/runtime_certified_bounded_error_quantised_attention.tex` (PDF alongside).
 
-This repository is a cleaned extraction from the current DotCache paper branch.
-It keeps the implementation, benchmark drivers, and retained JSON artifacts
-needed to inspect or rerun the paper results. DotCache experiments unrelated to
-the paper path have been removed.
+This repository is a cleaned extraction from the DotCache paper branch. It
+keeps the implementation, benchmark drivers, and retained JSON artifacts needed
+to inspect or rerun the paper results. DotCache experiments unrelated to the
+paper path have been removed. Released under the MIT licence (see `LICENSE`);
+the version corresponding to the paper is tagged `arxiv-v1`.
 
 ## Layout
 
 ```text
 paper/
-  Certified_Quantised_Attention.tex
+  runtime_certified_bounded_error_quantised_attention.tex
+  runtime_certified_bounded_error_quantised_attention.pdf
 dotcache/
   integrations/llama.py
   kernels/
@@ -21,10 +23,11 @@ benchmarks/
   paper/
   run_experiment_v2_sweep.py
 runs/
-  paper_v2_*/
-  perf_single_machine/
-  niah_64k_remaining/
-  ruler_* follow-ups
+  paper_v2_*/                  # certified system, main quality results
+  naive_int8k_int4v_*/         # naive INT8K/INT4V baseline (Table tab:naive)
+  perf_single_machine/         # performance and memory telemetry
+  niah_64k_remaining/          # NIAH 64K follow-up trials
+  ruler_*                      # RULER follow-up ablations
 tests/
   paper CLI, provenance, CI helper, and CUDA smoke tests
 ```

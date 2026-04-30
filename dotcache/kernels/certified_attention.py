@@ -1145,6 +1145,44 @@ def certified_attention_layer(
     prefetched_key_block_slots: torch.Tensor | None = None
     int8_token_scores: torch.Tensor | None = None
 
+    naive_int8k_int4v = (
+        cache.values_int4_packed is not None
+        and not collect_stats
+        and (tau_cov is None or tau_cov <= 0)
+        and int(top_k_fp16_keys or 0) <= 0
+        and not ranking_fallback
+        and not score_consistency_check
+        and exploration_rate <= 0
+    )
+    if naive_int8k_int4v:
+        # Plain quantised baseline: all active blocks use INT8 keys + INT4 values
+        # directly. Bypass Phase-1 scoring and every certificate/fallback branch.
+        with _PhaseTimer(phase_timings, "phase2_fused_attend"):
+            _nt_active = cache.aligned_tokens
+            no_skip_i32 = _workspace_tensor(
+                cache,
+                "naive_int8k_int4v_no_skip_i32",
+                (num_q_heads, cache.active_blocks),
+                dtype=torch.int32,
+                device=q_all.device,
+                fill_value=0,
+            )
+            output = selective_attend_multihead_int8k_int4v(
+                keys_int8=cache.keys_int8_active(),
+                keys_scale=cache.keys_scale_active(),
+                keys_zero_points=cache.keys_zero_points_active(),
+                values_int4_packed=cache.values_int4_packed[:, :_nt_active, :],
+                values_int4_scales=cache.values_int4_scales[:, :_nt_active, :],
+                values_int4_zeros=cache.values_int4_zeros[:, :_nt_active, :],
+                q_all=q_all,
+                skip_mask_i32=no_skip_i32,
+                gqa_group=gqa_group,
+                block_size=cache.block_size,
+                group_size=cache.values_int4_group_size,
+                q_scale=q_scale,
+            )
+        return output, {}
+
     # Phase 1: INT8 scoring only on fully quantized blocks
     if n_qblocks > 0:
         with _PhaseTimer(phase_timings, "phase1_int8_scoring"):
@@ -1693,7 +1731,9 @@ def certified_attention_layer(
     # exceed Δ + eps_guard, Theorem 2's bound was empirically broken, so we
     # page in all FP16 keys+values from Tier 2 and recompute dense attention
     # for every head via SDPA. This guarantees dense-equivalent output on the
-    # compromised step and subsumes the per-head Rung-3 action.
+    # compromised step and subsumes the per-head Rung-3 action. Expected
+    # zero-fire on well-behaved runs; observed zero across every cell of the
+    # arXiv v1 sweep (4K/8K/16K/32K).
     rung4_fired = (
         score_consistency_check
         and score_consistency_violation_heads > 0

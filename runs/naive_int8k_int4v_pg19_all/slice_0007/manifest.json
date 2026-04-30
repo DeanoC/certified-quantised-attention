@@ -1,0 +1,53 @@
+{
+  "slice_id": 7,
+  "mode": "context",
+  "model": "NousResearch/Meta-Llama-3.1-8B",
+  "cache_mode": "full-bounded",
+  "cert_profile": "naive-int8k-int4v",
+  "niah_trials_per_slice": 1,
+  "created": "2026-04-28T21:33:27.159020+00:00",
+  "provenance": {
+    "host": "afa25ee8691c",
+    "cwd": "/workspace/DotCache",
+    "python": "/workspace/DotCache/.venv/bin/python",
+    "git_commit": "caf2efd2371d9c5178042f40b275d2c73c08a950",
+    "git_branch": "port-to-paper-20260424",
+    "git_dirty": true
+  },
+  "jobs": [
+    {
+      "slice_id": 7,
+      "benchmark": "pg19",
+      "context_length": 32768,
+      "output": "runs/naive_int8k_int4v_pg19_all/slice_0007/32K/pg19_slice_0007_32K.json",
+      "log": "runs/naive_int8k_int4v_pg19_all/slice_0007/32K/pg19_slice_0007_32K.log",
+      "command_string": "/workspace/DotCache/.venv/bin/python /workspace/DotCache/benchmarks/paper/pg19_perplexity.py --context 32768 --chunk-index 7 --telemetry-mode summary --certified-warmup-steps 128 --output runs/naive_int8k_int4v_pg19_all/slice_0007/32K/pg19_slice_0007_32K.json --model NousResearch/Meta-Llama-3.1-8B --cert-profile naive-int8k-int4v --v-tolerance 1000000000.0 --use-int4-values --group-size 16 --tau-cov 0 --k-min 0 --k-max 0 --eps-guard 0.01 --exploration-rate 0.0 --rung1-threshold 1.0 --rung1-multiplier 1.0 --fp16-key-cache-blocks 0 --fp16-value-cache-blocks 0 --top-k-override 0",
+      "cache_mode": "full-bounded",
+      "cert_profile": "naive-int8k-int4v",
+      "recommended_v2_cache_blocks": [
+        1792,
+        768
+      ]
+    }
+  ],
+  "completed": [
+    {
+      "slice_id": 7,
+      "benchmark": "pg19",
+      "context_length": 32768,
+      "output": "runs/naive_int8k_int4v_pg19_all/slice_0007/32K/pg19_slice_0007_32K.json",
+      "log": "runs/naive_int8k_int4v_pg19_all/slice_0007/32K/pg19_slice_0007_32K.log",
+      "command_string": "/workspace/DotCache/.venv/bin/python /workspace/DotCache/benchmarks/paper/pg19_perplexity.py --context 32768 --chunk-index 7 --telemetry-mode summary --certified-warmup-steps 128 --output runs/naive_int8k_int4v_pg19_all/slice_0007/32K/pg19_slice_0007_32K.json --model NousResearch/Meta-Llama-3.1-8B --cert-profile naive-int8k-int4v --v-tolerance 1000000000.0 --use-int4-values --group-size 16 --tau-cov 0 --k-min 0 --k-max 0 --eps-guard 0.01 --exploration-rate 0.0 --rung1-threshold 1.0 --rung1-multiplier 1.0 --fp16-key-cache-blocks 0 --fp16-value-cache-blocks 0 --top-k-override 0",
+      "cache_mode": "full-bounded",
+      "cert_profile": "naive-int8k-int4v",
+      "recommended_v2_cache_blocks": [
+        1792,
+        768
+      ],
+      "started": "2026-04-28T21:33:27.264913+00:00",
+      "ended": "2026-04-28T22:30:15.855775+00:00",
+      "wall_seconds": 3408.5908301388845,
+      "exit_code": 0
+    }
+  ]
+}

@@ -168,7 +168,8 @@ class CertifiedAttentionState:
             raise ValueError(
                 "CertifiedAttentionState requires explicit v_tolerance "
                 "(paper §7 spec: 0.05). Set v_tolerance=... at construction. "
-                "No silent default is allowed for reviewer-facing paper runs."
+                "No silent default — see docs/paper_code_audit_20260424.md "
+                "for the v_tolerance plumbing bug this guard prevents."
             )
 
     def clear_step_stats(self) -> list[dict]:
@@ -1046,7 +1047,7 @@ class LlamaDotCacheModelAdapter:
             tiered_caches = create_tiered_cache_from_model(
                 past_key_values, layer_ids, block_size=block_size,
                 max_new_tokens=max_new_tokens,
-                fp16_key_cache_capacity=None,
+                fp16_key_cache_capacity=fp16_key_cache_capacity,
             )
 
         self.certified_state = CertifiedAttentionState(
