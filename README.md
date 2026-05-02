@@ -1,7 +1,7 @@
 # Runtime Certified Bounded Error Quantised Attention
 
 Reviewer-facing artifact for the paper in
-`paper/runtime_certified_bounded_error_quantised_attention.tex` (PDF alongside).
+`paper/runtime_certified_bounded_error_quantized_attention.tex` (PDF alongside).
 
 This repository is a cleaned extraction from the DotCache paper branch. It
 keeps the implementation, benchmark drivers, and retained JSON artifacts needed
@@ -13,8 +13,8 @@ the version corresponding to the paper is tagged `arxiv-v1`.
 
 ```text
 paper/
-  runtime_certified_bounded_error_quantised_attention.tex
-  runtime_certified_bounded_error_quantised_attention.pdf
+  runtime_certified_bounded_error_quantized_attention.tex
+  runtime_certified_bounded_error_quantized_attention.pdf
 dotcache/
   integrations/llama.py
   kernels/

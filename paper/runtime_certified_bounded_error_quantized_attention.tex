@@ -23,16 +23,16 @@
 \usepackage{hyperref}
 \hypersetup{
   hidelinks,
-  pdftitle={Runtime-Certified Bounded-Error Quantised Attention},
+  pdftitle={Runtime-Certified Bounded-Error Quantized Attention},
   pdfauthor={Dean Calver},
-  pdfsubject={KV cache quantisation with formal error bounds and FP16 fallback},
-  pdfkeywords={KV cache, quantisation, attention, LLM inference, error bounds}
+  pdfsubject={KV cache quantization with formal error bounds and FP16 fallback},
+  pdfkeywords={KV cache, quantization, attention, LLM inference, error bounds}
 }
 
 % ---- Page style ----
 \pagestyle{fancy}
 \fancyhf{}
-\rhead{\textit{\small Runtime-Certified Bounded-Error Quantised Attention}}
+\rhead{\textit{\small Runtime-Certified Bounded-Error Quantized Attention}}
 \cfoot{\thepage}
 \renewcommand{\headrulewidth}{0.4pt}
 
@@ -73,7 +73,7 @@
 % ---- Title ----
 \begin{center}
   {\LARGE\bfseries Runtime-Certified Bounded-Error}\\[4pt]
-  {\LARGE\bfseries Quantised Attention}\\[10pt]
+  {\LARGE\bfseries Quantized Attention}\\[10pt]
   {\large\itshape Per-Head, Per-Step Error Bounds for Compressed KV Caches\\
   with Dense FP16 Fallback}\\[8pt]
   Dean Calver\\[2pt]
@@ -88,13 +88,13 @@
 % ---- Abstract ----
 
 \begin{abstract}
-KV cache quantisation reduces the memory cost of long-context LLM inference, but introduces approximation error that is typically validated only empirically. Existing systems rely on average-case robustness, with no mechanism to detect or recover from failures at runtime.
+KV cache quantization reduces the memory cost of long-context LLM inference, but introduces approximation error that is typically validated only empirically. Existing systems rely on average-case robustness, with no mechanism to detect or recover from failures at runtime.
 
-We present a tiered KV cache architecture that enables runtime-certified attention: INT8 keys and INT4 values are stored in GPU memory, while FP16 originals are retained in system RAM for deterministic fallback. A two-term error decomposition yields per-head, per-step bounds on (i) attention distribution distortion from key quantisation and (ii) value reconstruction error. These bounds are computed online and used to drive adaptive precision selection and a multi-stage fallback ladder, which guarantees recovery to the exact dense attention output when required.
+We present a tiered KV cache architecture that enables runtime-certified attention: INT8 keys and INT4 values are stored in GPU memory, while FP16 originals are retained in system RAM for deterministic fallback. A two-term error decomposition yields per-head, per-step bounds on (i) attention distribution distortion from key quantization and (ii) value reconstruction error. These bounds are computed online and used to drive adaptive precision selection and a multi-stage fallback ladder, which guarantees recovery to the exact dense attention output when required.
 
 Across PG-19, NIAH, and RULER benchmarks on LLaMA~3.1-8B with contexts up to 128K, the system matches dense FP16 KV quality within noise for language modelling and retrieval tasks, while recovering catastrophic failures observed in naive INT8/INT4 baselines. Value-sensitive tasks at short context expose a controlled trade-off between compression and fidelity, which can be eliminated via tighter value tolerances or FP16-value fallback.
 
-The certification is local (per-head, per-step) and does not guarantee end-to-end model correctness, but ensures that each attention computation is either bounded relative to an FP16 reference or exactly recovered via fallback. This reframes KV cache quantisation as a runtime-verified computation rather than a fixed approximation. The goal is not raw speedups, but enabling safe deployment of aggressive KV compression under strict quality constraints.
+The certification is local (per-head, per-step) and does not guarantee end-to-end model correctness, but ensures that each attention computation is either bounded relative to an FP16 reference or exactly recovered via fallback. This reframes KV cache quantization as a runtime-verified computation rather than a fixed approximation. The goal is not raw speedups, but enabling safe deployment of aggressive KV compression under strict quality constraints.
 \end{abstract}
 
 \vspace{4pt}
@@ -108,19 +108,19 @@ The certification is local (per-head, per-step) and does not guarantee end-to-en
 
 Autoregressive LLM decoding at long context lengths is dominated by the cost of reading the key-value (KV) cache from GPU memory.  Each decode step fetches cached keys and values for every attention head, a cost linear in sequence length.  At 128K context on LLaMA~3.1-8B (32 layers, 32 query heads, 8 KV heads under GQA, and head dimension 128), the FP16 KV cache occupies roughly 17\,GB and consumes the majority of available memory bandwidth during decode.
 
-KV cache quantisation~\cite{kvquant,kivi,qjl,innerq} addresses this by storing keys and values in reduced-precision formats---typically INT8, INT4, or lower.  The savings are substantial: an INT8 cache halves memory usage, and INT4 quarters it.  But quantisation introduces error, and the relationship between quantisation parameters and output quality is complex.  The same quantisation scheme that works well on one prompt may fail on another, depending on the attention pattern, the key/value distributions, and the specific tokens being attended to.
+KV cache quantization~\cite{kvquant,kivi,qjl,innerq} addresses this by storing keys and values in reduced-precision formats---typically INT8, INT4, or lower.  The savings are substantial: an INT8 cache halves memory usage, and INT4 quarters it.  But quantization introduces error, and the relationship between quantization parameters and output quality is complex.  The same quantization scheme that works well on one prompt may fail on another, depending on the attention pattern, the key/value distributions, and the specific tokens being attended to.
 
 The standard response is empirical validation: run a benchmark suite, check that perplexity doesn't degrade beyond a threshold, and deploy.  This works in practice but provides no per-step guarantee.  A system that achieves $\Delta\text{ppl} < 0.1$ on average may still exhibit large step-wise deviations on individual decode steps---and there is no mechanism to detect when this happens, let alone recover from it.
 
-KV cache quantisation and compressed-domain attention are well-established techniques.  What is missing is a \emph{guarantee}: a way to bound, at each decode step, how far the quantised output deviates from an unquantised reference---and a way to recover the production dense output when the bound is too large.\footnote{The paper distinguishes three reference outputs: $O_{\mathrm{dense}}$ (production Dense baseline via \torchsdpa{}), $O_{\mathrm{ref}}$ (same certified kernel with unquantised FP16 KV), and $O_{\mathrm{quant}}$ (certified kernel with quantised KV).  The formal bounds (Section~\ref{sec:bounds}) certify $\norm{O_{\mathrm{quant}} - O_{\mathrm{ref}}}$; the arithmetic-path gap $\norm{O_{\mathrm{ref}} - O_{\mathrm{dense}}}$ is characterised in Section~\ref{sec:numerical}.  On fallback, the system returns $O_{\mathrm{dense}}$ directly.}
+KV cache quantization and compressed-domain attention are well-established techniques.  What is missing is a \emph{guarantee}: a way to bound, at each decode step, how far the quantized output deviates from an unquantized reference---and a way to recover the production dense output when the bound is too large.\footnote{The paper distinguishes three reference outputs: $O_{\mathrm{dense}}$ (production Dense baseline via \torchsdpa{}), $O_{\mathrm{ref}}$ (same certified kernel with unquantized FP16 KV), and $O_{\mathrm{quant}}$ (certified kernel with quantized KV).  The formal bounds (Section~\ref{sec:bounds}) certify $\norm{O_{\mathrm{quant}} - O_{\mathrm{ref}}}$; the arithmetic-path gap $\norm{O_{\mathrm{ref}} - O_{\mathrm{dense}}}$ is characterised in Section~\ref{sec:numerical}.  On fallback, the system returns $O_{\mathrm{dense}}$ directly.}
 
-This paper develops such a guarantee together with a practical recovery mechanism.  In this sense, it reframes KV cache quantisation as a runtime-verified computation rather than a fixed approximation.  Unlike prior adaptive-precision systems (Section~\ref{sec:related}), it provides a runtime-computable error bound and a deterministic recovery path to the exact dense baseline.  The key ideas are:
+This paper develops such a guarantee together with a practical recovery mechanism.  In this sense, it reframes KV cache quantization as a runtime-verified computation rather than a fixed approximation.  Unlike prior adaptive-precision systems (Section~\ref{sec:related}), it provides a runtime-computable error bound and a deterministic recovery path to the exact dense baseline.  The key ideas are:
 
-\textbf{1.\ Tiered storage with dense fallback.}  Quantised keys and values live in GPU memory; full-precision originals live in pinned system RAM\@.  The FP16 data is not discarded after quantisation---it is retained as a safety net.  Any block can be escalated to full precision at any time, at the cost of a host-to-device page-in from system RAM (overlappable with GPU compute).  The terminal fallback path uses the same \torchsdpa{} code path and FP16 KV inputs as the Dense baseline.  This fallback is unconditional in correctness, though not in cost: it requires transient staging memory for one layer's KV and host-to-device bandwidth for the page-in, but never requires the full dense cache to be persistently resident in VRAM (Section~\ref{sec:fallback}).
+\textbf{1.\ Tiered storage with dense fallback.}  Quantized keys and values live in GPU memory; full-precision originals live in pinned system RAM\@.  The FP16 data is not discarded after quantization---it is retained as a safety net.  Any block can be escalated to full precision at any time, at the cost of a host-to-device page-in from system RAM (overlappable with GPU compute).  The terminal fallback path uses the same \torchsdpa{} code path and FP16 KV inputs as the Dense baseline.  This fallback is unconditional in correctness, though not in cost: it requires transient staging memory for one layer's KV and host-to-device bandwidth for the page-in, but never requires the full dense cache to be persistently resident in VRAM (Section~\ref{sec:fallback}).
 
-\textbf{2.\ Formal error bounds with runtime monitoring.}  A two-term error decomposition bounds the output perturbation from key compression and value compression independently.  The key compression error depends on how quantisation shifts the softmax distribution; the value compression error depends on the per-token reconstruction quality.  Both bounds are computable at runtime from quantities the system already tracks (quantisation scales, query norms, value ranges), enabling per-head, per-step precision decisions.
+\textbf{2.\ Formal error bounds with runtime monitoring.}  A two-term error decomposition bounds the output perturbation from key compression and value compression independently.  The key compression error depends on how quantization shifts the softmax distribution; the value compression error depends on the per-token reconstruction quality.  Both bounds are computable at runtime from quantities the system already tracks (quantization scales, query norms, value ranges), enabling per-head, per-step precision decisions.
 
-\textbf{3.\ Adaptive per-block precision selection.}  Rather than applying a single quantisation policy uniformly, the system selects key precision per block based on each block's importance to the current query.  Blocks holding the majority of the attention mass use FP16 keys (paged in from system RAM); the remaining blocks use INT8 keys with INT4 values stored in VRAM.  The selection adapts to the actual attention pattern at each decode step, providing FP16-quality scoring on the blocks that matter while retaining quantised efficiency on the long tail.
+\textbf{3.\ Adaptive per-block precision selection.}  Rather than applying a single quantization policy uniformly, the system selects key precision per block based on each block's importance to the current query.  Blocks holding the majority of the attention mass use FP16 keys (paged in from system RAM); the remaining blocks use INT8 keys with INT4 values stored in VRAM.  The selection adapts to the actual attention pattern at each decode step, providing FP16-quality scoring on the blocks that matter while retaining quantized efficiency on the long tail.
 
 \subsection{Contributions}
 
@@ -129,14 +129,14 @@ This paper develops such a guarantee together with a practical recovery mechanis
 
   \item A \textbf{two-term error decomposition} (key compression error + value compression error) with independent, per-head, per-step bounds computable at runtime.
 
-  \item An \textbf{adaptive precision selection mechanism} that uses the attention mass distribution (computed from quantised scores) to determine which blocks require FP16 keys, providing a guaranteed bound on key compression error.
+  \item An \textbf{adaptive precision selection mechanism} that uses the attention mass distribution (computed from quantized scores) to determine which blocks require FP16 keys, providing a guaranteed bound on key compression error.
 
   \item A \textbf{ranking-consistency check} that detects when INT8 scoring noise distorts the attention distribution, triggering per-head fallback to dense attention.  This mechanism is critical: it converts a previously unaddressed silent failure mode into a detectable and recoverable event when non-uniform precision would otherwise dilute attention on retrieval-critical tokens.
 
   \item A \textbf{four-rung fallback ladder} that escalates through increasingly conservative precision modes, with full FP16 recomputation as the unconditional terminal state.
 \end{enumerate}
 
-\textbf{What this paper does \emph{not} claim.}  We do not claim end-to-end model-quality guarantees.  The error bounds are \emph{per-head, per-step}: they bound $\norm{O_{\mathrm{quant}} - O_{\mathrm{ref}}}$ (quantised output vs.\ same kernel with FP16 KV; Section~\ref{sec:decomposition}) for a single head at a single decode step.  On fallback, the system returns $O_{\mathrm{dense}}$ directly.  The aggregate effect on model quality is assessed empirically.
+\textbf{What this paper does \emph{not} claim.}  We do not claim end-to-end model-quality guarantees.  The error bounds are \emph{per-head, per-step}: they bound $\norm{O_{\mathrm{quant}} - O_{\mathrm{ref}}}$ (quantized output vs.\ same kernel with FP16 KV; Section~\ref{sec:decomposition}) for a single head at a single decode step.  On fallback, the system returns $O_{\mathrm{dense}}$ directly.  The aggregate effect on model quality is assessed empirically.
 
 
 % ---- System overview figure ----
@@ -202,7 +202,7 @@ This paper develops such a guarantee together with a practical recovery mechanis
 \end{scope}
 \end{tikzpicture}
 }
-\caption{System overview.  Tier-1 stores compressed KV in VRAM; Tier-2 retains FP16 originals in CPU RAM\@.  Phase~1 computes INT8 block log-masses; the adaptive selector chooses top-$K^*$ blocks for FP16 key promotion; Phase~2 fuses the mask-gated attend with INT4 value dequantisation.  The fallback ladder (dashed red) escalates precision when monitors detect bound violations, with Rung~4 returning $O_{\mathrm{dense}}$ unconditionally.}
+\caption{System overview.  Tier-1 stores compressed KV in VRAM; Tier-2 retains FP16 originals in CPU RAM\@.  Phase~1 computes INT8 block log-masses; the adaptive selector chooses top-$K^*$ blocks for FP16 key promotion; Phase~2 fuses the mask-gated attend with INT4 value dequantization.  The fallback ladder (dashed red) escalates precision when monitors detect bound violations, with Rung~4 returning $O_{\mathrm{dense}}$ unconditionally.}
 \label{fig:overview}
 \end{figure*}
 
@@ -223,10 +223,10 @@ where $q \in \R^d$ is the current query, $K \in \R^{N \times d}$ the cached keys
 
 The KV cache is partitioned into contiguous blocks of $B$ tokens (typically $B = 16$).  Block $b$ contains keys $\{k_t\}_{t \in b}$ and values $\{v_t\}_{t \in b}$.  All precision decisions and error monitoring operate at block granularity.  The block is the atomic unit of page-in from system RAM.
 
-\subsection{Quantisation Schemes}
+\subsection{Quantization Schemes}
 \label{sec:quant_schemes}
 
-\textbf{Per-channel INT8 keys.}  Each of the $d$ key channels is quantised independently with its own scale $\sigma_c$ and real-valued offset $z_c$:
+\textbf{Per-channel INT8 keys.}  Each of the $d$ key channels is quantized independently with its own scale $\sigma_c$ and real-valued offset $z_c$:
 \begin{equation}
   k_{t,c}^{\mathrm{int8}} = \mathrm{clamp}\!\left(\mathrm{round}\!\left(\frac{k_{t,c} - z_c}{\sigma_c}\right),\, -128,\, 127\right),
 \end{equation}
@@ -235,21 +235,21 @@ The KV cache is partitioned into contiguous blocks of $B$ tokens (typically $B =
 \end{equation}
 For a completed block with channel minimum $\ell_c$ and maximum $u_c$, the affine parameters are chosen as $\sigma_c=(u_c-\ell_c)/255$ and $z_c=\ell_c+128\sigma_c=u_c-127\sigma_c$ (with the degenerate constant-channel case handled by an implementation guard).  Thus every value used to fit the block is representable without clipping, and round-to-nearest gives the deterministic reconstruction bound $|k_{t,c}-\hat{k}_{t,c}|\leq \sigma_c/2$.
 
-Quantisation is applied to keys \emph{after} RoPE (rotary position embeddings) has been applied, since LLaMA-family models store post-RoPE keys in the KV cache.  The quantisation error bound $\Delta$ therefore accounts for any position-dependent magnitude variation introduced by RoPE\@.
+Quantization is applied to keys \emph{after} RoPE (rotary position embeddings) has been applied, since LLaMA-family models store post-RoPE keys in the KV cache.  The quantization error bound $\Delta$ therefore accounts for any position-dependent magnitude variation introduced by RoPE\@.
 
-Per-channel quantisation is critical for keys.  Key channels have widely varying magnitudes (dynamic ranges spanning two orders of magnitude within a single head are common).  Per-block quantisation (one scale for all channels) forces low-magnitude channels to share a scale set by the high-magnitude channels, crushing them to 1--2 INT8 levels.  This produces measurable quality degradation on language modelling benchmarks.  Per-channel quantisation, established by KVQuant~\cite{kvquant} and adopted as standard practice, eliminates this by allowing each channel its own scale.
+Per-channel quantization is critical for keys.  Key channels have widely varying magnitudes (dynamic ranges spanning two orders of magnitude within a single head are common).  Per-block quantization (one scale for all channels) forces low-magnitude channels to share a scale set by the high-magnitude channels, crushing them to 1--2 INT8 levels.  This produces measurable quality degradation on language modelling benchmarks.  Per-channel quantization, established by KVQuant~\cite{kvquant} and adopted as standard practice, eliminates this by allowing each channel its own scale.
 
-The per-channel scales and offsets are \emph{per-block}: each block of $B$ tokens has its own set of $2d$ FP32 values (scale + offset), computed once when the block is filled and never updated thereafter.  Appended tokens accumulate in a trailing partial block that remains in FP16 until $B$ tokens have arrived; at that point the block is quantised atomically with scales derived from those $B$ tokens alone.  This design eliminates the stale-scale problem: old blocks' INT8 codes always match their stored metadata, and the quantisation error $\Delta_b$ is block-local.  The per-block metadata costs $2d \times 4 / B = 64$ bytes per token at $d{=}128$, $B{=}16$, adding 50\% to the raw INT8 key storage.  Total key-side Tier-1 storage is $128 + 64 = 192$ bytes per token, or 75\% of FP16 keys (256 bytes per token).  The INT8 codes alone are half the size of FP16, but the per-channel metadata narrows the effective compression.
+The per-channel scales and offsets are \emph{per-block}: each block of $B$ tokens has its own set of $2d$ FP32 values (scale + offset), computed once when the block is filled and never updated thereafter.  Appended tokens accumulate in a trailing partial block that remains in FP16 until $B$ tokens have arrived; at that point the block is quantized atomically with scales derived from those $B$ tokens alone.  This design eliminates the stale-scale problem: old blocks' INT8 codes always match their stored metadata, and the quantization error $\Delta_b$ is block-local.  The per-block metadata costs $2d \times 4 / B = 64$ bytes per token at $d{=}128$, $B{=}16$, adding 50\% to the raw INT8 key storage.  Total key-side Tier-1 storage is $128 + 64 = 192$ bytes per token, or 75\% of FP16 keys (256 bytes per token).  The INT8 codes alone are half the size of FP16, but the per-channel metadata narrows the effective compression.
 
-\textbf{Per-group INT4 values.}  Each value vector of dimension $d$ is divided into groups of $g$ elements (default $g = 16$).  Each group is independently quantised to INT4 with its own FP16 scale and real-valued offset.  Two INT4 values are packed into a single byte.
+\textbf{Per-group INT4 values.}  Each value vector of dimension $d$ is divided into groups of $g$ elements (default $g = 16$).  Each group is independently quantized to INT4 with its own FP16 scale and real-valued offset.  Two INT4 values are packed into a single byte.
 
-Per-group granularity is necessary for values because value vectors exhibit higher intra-vector dynamic range variation than keys.  A single scale for the full $d{=}128$ vector would crush groups with small magnitudes.  The group size $g$ controls a quality--storage tradeoff: smaller groups provide finer-grained quantisation at the cost of more metadata.  Empirically, $g{=}16$ achieves near-lossless \emph{perplexity} ($\Delta\text{ppl} = +0.03$) with zero fallback escalation at the default tolerance; however, value-sensitive tasks such as variable tracking and word extraction show measurable degradation at short contexts (Section~\ref{sec:ruler_8k_ablation}).  Smaller groups ($g{=}4, 8$) give the same quality but worse storage; larger groups ($g{=}32$) save marginally more memory but degrade sharply (Section~\ref{sec:results}).
+Per-group granularity is necessary for values because value vectors exhibit higher intra-vector dynamic range variation than keys.  A single scale for the full $d{=}128$ vector would crush groups with small magnitudes.  The group size $g$ controls a quality--storage tradeoff: smaller groups provide finer-grained quantization at the cost of more metadata.  Empirically, $g{=}16$ achieves near-lossless \emph{perplexity} ($\Delta\text{ppl} = +0.03$) with zero fallback escalation at the default tolerance; however, value-sensitive tasks such as variable tracking and word extraction show measurable degradation at short contexts (Section~\ref{sec:ruler_8k_ablation}).  Smaller groups ($g{=}4, 8$) give the same quality but worse storage; larger groups ($g{=}32$) save marginally more memory but degrade sharply (Section~\ref{sec:results}).
 
-The storage cost is $d/2$ bytes per token for the quantised values (INT4 packed), plus $2 \times (d/g) \times 2$ bytes per token for FP16 scales and offsets.  For $d{=}128$ and $g{=}16$: 64 bytes (values) + 32 bytes (metadata) = 96 bytes per token, compared to 256 bytes for FP16.  This is 37.5\% of FP16.
+The storage cost is $d/2$ bytes per token for the quantized values (INT4 packed), plus $2 \times (d/g) \times 2$ bytes per token for FP16 scales and offsets.  For $d{=}128$ and $g{=}16$: 64 bytes (values) + 32 bytes (metadata) = 96 bytes per token, compared to 256 bytes for FP16.  This is 37.5\% of FP16.
 
-\textbf{Value error annotation.}  At quantisation time (cache write), the system computes the per-token $\ell_2$ reconstruction error $\norm{\hat{V}_t - V_t}_2$ and reduces it to a per-block maximum $\eta_b$.  It also stores the per-block maximum value norm $\nu_b = \max_{t \in b}\norm{V_t}_2$; the key error bound uses $V_{\max} = \max_b \nu_b$.  Both annotations are one float per block, stored alongside the block in VRAM\@.  Computing $\eta_b$ and $\nu_b$ at write time avoids the circular dependency of needing FP16 originals to check quality at attend time.
+\textbf{Value error annotation.}  At quantization time (cache write), the system computes the per-token $\ell_2$ reconstruction error $\norm{\hat{V}_t - V_t}_2$ and reduces it to a per-block maximum $\eta_b$.  It also stores the per-block maximum value norm $\nu_b = \max_{t \in b}\norm{V_t}_2$; the key error bound uses $V_{\max} = \max_b \nu_b$.  Both annotations are one float per block, stored alongside the block in VRAM\@.  Computing $\eta_b$ and $\nu_b$ at write time avoids the circular dependency of needing FP16 originals to check quality at attend time.
 
-\textbf{FP16 originals.}  The unquantised FP16 keys and values are retained in pinned system RAM after quantisation.  They are the ground truth for the attention computation and serve as the unconditional fallback when quantised precision is insufficient.
+\textbf{FP16 originals.}  The unquantized FP16 keys and values are retained in pinned system RAM after quantization.  They are the ground truth for the attention computation and serve as the unconditional fallback when quantized precision is insufficient.
 
 
 % =============================================================
@@ -261,24 +261,24 @@ The storage cost is $d/2$ bytes per token for the quantised values (INT4 packed)
 
 The KV cache is stored across two tiers, each serving a distinct role:
 
-\textbf{Tier 1 --- VRAM (hot).}  Per-channel INT8 keys and per-group INT4 values, co-located with their quantisation metadata (per-channel scales/offsets for keys, per-group FP16 scales/offsets for values) and per-block value error annotations $\eta_b$.  This is the data consumed during normal attention execution.  Total storage per token is detailed in Section~\ref{sec:storage}.
+\textbf{Tier 1 --- VRAM (hot).}  Per-channel INT8 keys and per-group INT4 values, co-located with their quantization metadata (per-channel scales/offsets for keys, per-group FP16 scales/offsets for values) and per-block value error annotations $\eta_b$.  This is the data consumed during normal attention execution.  Total storage per token is detailed in Section~\ref{sec:storage}.
 
 \textbf{Tier 2 --- CPU pinned RAM (cold).}  FP16 keys and values.  The ground truth.  Accessed when the adaptive precision selector promotes blocks to FP16 key precision, or when the value error annotation $\eta_b$ indicates that a block's INT4 values exceed the configured tolerance.  Page-in latency varies by interconnect: ${\sim}3$\,$\mu$s per block over PCIe~5.0, lower over NVLink or CXL, effectively zero on unified-memory architectures.  Optionally, a small VRAM scratch cache of recently paged-in FP16 blocks can amortise repeated page-in across consecutive decode steps; this does not affect correctness but reduces host-to-device transfer traffic in practice.  Storage per token: 100\% of FP16.
 
-The key architectural decision is retaining Tier~2.  Conventional systems discard FP16 originals after quantisation; by retaining them in system RAM, the system gains an unconditional fallback mechanism at the cost of $\approx 16$\,GB at 128K context (Section~\ref{sec:limitations}).
+The key architectural decision is retaining Tier~2.  Conventional systems discard FP16 originals after quantization; by retaining them in system RAM, the system gains an unconditional fallback mechanism at the cost of $\approx 16$\,GB at 128K context (Section~\ref{sec:limitations}).
 
-\subsection{Fused Quantised Attention Kernel}
+\subsection{Fused Quantized Attention Kernel}
 \label{sec:kernel}
 
-The attention kernel executes directly on the quantised data in Tier 1, performing in-register dequantisation rather than staging through an FP16 buffer.  This is the ``compressed-domain execution'' approach introduced by HACK~\cite{hack} and VecInfer~\cite{vecinfer}: the INT8 keys are dequantised to FP16 in registers during the dot product, and the INT4 values are dequantised in registers during the weighted sum.  No intermediate FP16 buffer is allocated.
+The attention kernel executes directly on the quantized data in Tier 1, performing in-register dequantization rather than staging through an FP16 buffer.  This is the ``compressed-domain execution'' approach introduced by HACK~\cite{hack} and VecInfer~\cite{vecinfer}: the INT8 keys are dequantized to FP16 in registers during the dot product, and the INT4 values are dequantized in registers during the weighted sum.  No intermediate FP16 buffer is allocated.
 
 For a single decode step:
 \begin{enumerate}[leftmargin=2em,itemsep=2pt]
   \item For each block $b$, read INT8 keys from VRAM ($B \times d$ bytes).
-  \item Dequantise each key channel in registers: $\hat{k}_{t,c} = k_{t,c}^{\mathrm{int8}} \cdot \sigma_c + z_c$.
+  \item Dequantize each key channel in registers: $\hat{k}_{t,c} = k_{t,c}^{\mathrm{int8}} \cdot \sigma_c + z_c$.
   \item Compute attention logits: $s_{b,t} = q \cdot \hat{k}_{b,t} / \sqrt{d}$.
   \item Compute block statistics: $m_b = \max_t s_{b,t}$ and per-block unnormalised mass.
-  \item Read INT4 values from VRAM, dequantise per-group in registers.
+  \item Read INT4 values from VRAM, dequantize per-group in registers.
   \item Accumulate into online softmax state: weights $\times$ values.
 \end{enumerate}
 
@@ -295,7 +295,7 @@ The scoring pass over all blocks produces per-block mass estimates used by the a
 \textbf{Output:} Attention output $O$ \\[4pt]
 \textit{// --- Phase 1: INT8 scoring (block log-masses for adaptive selector) ---} \\
 \textbf{for} each block $b$ \textbf{do} \\
-\quad Dequantise INT8 keys in-register: $\hat{k}_{t,c} = k_{t,c}^{\mathrm{int8}} \cdot \sigma_c + z_c$ \\
+\quad Dequantize INT8 keys in-register: $\hat{k}_{t,c} = k_{t,c}^{\mathrm{int8}} \cdot \sigma_c + z_c$ \\
 \quad Compute logits: $s_{b,t} = q \cdot \hat{k}_{b,t} / \sqrt{d}$ \\
 \quad $m_b \leftarrow \max_t s_{b,t}$; \quad $S_b \leftarrow \sum_{t \in b} \exp(s_{b,t} - m_b)$ \\
 \quad $\ell_b \leftarrow m_b + \log S_b$ \quad \textit{// block log-mass (globally comparable)} \\
@@ -308,7 +308,7 @@ Page in FP16 keys for blocks $b \in \mathcal{F}$ from Tier~2 into scratch buffer
 Initialise online softmax state: $m \leftarrow -\infty$ (FP32), $\ell \leftarrow 0$ (FP32), $o \leftarrow \mathbf{0}$ (FP32, $d$-dim) \\[2pt]
 \textbf{for} each block $b$ \textbf{do} \\
 \quad \textit{// Load both key representations} \\
-\quad $\hat{k}^{\mathrm{int8}}_{b} \leftarrow$ dequantise INT8 keys for block $b$ \quad (always loaded) \\
+\quad $\hat{k}^{\mathrm{int8}}_{b} \leftarrow$ dequantize INT8 keys for block $b$ \quad (always loaded) \\
 \quad \textbf{if} $b \in \mathcal{F}$: $k^{\mathrm{fp16}}_{b} \leftarrow$ FP16 keys from scratch buffer \\[2pt]
 \quad \textit{// Branchless precision selection} \\
 \quad $k_b \leftarrow \begin{cases} k^{\mathrm{fp16}}_b & \text{if } b \in \mathcal{F} \\ \hat{k}^{\mathrm{int8}}_b & \text{otherwise} \end{cases}$ \quad (mask-gated \texttt{where}) \\[2pt]
@@ -371,20 +371,20 @@ The practical value of the system depends on Rungs~3 and~4 being rarely triggere
 \label{sec:decomposition}
 
 \paragraph{Intuition.}
-We bound two independent failure modes: (1) distortion of the attention distribution from key quantisation, and (2) reconstruction error of values.  Each is monitored separately at runtime and each has a distinct fallback path.
+We bound two independent failure modes: (1) distortion of the attention distribution from key quantization, and (2) reconstruction error of values.  Each is monitored separately at runtime and each has a distinct fallback path.
 
 \paragraph{Reference outputs (summary).}
 The paper distinguishes three attention outputs, each computed for a single head at a single decode step:
 
 \begin{itemize}[leftmargin=2em,itemsep=2pt]
 \item $O_{\mathrm{dense}}$: the output of \torchsdpa{} (Flash Attention) with FP16 keys and values.  This is the production Dense baseline.
-\item $O_{\mathrm{ref}}$: the output of the \emph{same certified attention kernel} used by the certified system, but operating on unquantised FP16 keys and values.  This isolates quantisation error from the arithmetic-path difference between the certified kernel and Flash Attention (tensor-core matmul).
-\item $O_{\mathrm{quant}}$: the output of the certified kernel operating on quantised (INT8 key / INT4 value) data.  This is the system's fast-path output.
+\item $O_{\mathrm{ref}}$: the output of the \emph{same certified attention kernel} used by the certified system, but operating on unquantized FP16 keys and values.  This isolates quantization error from the arithmetic-path difference between the certified kernel and Flash Attention (tensor-core matmul).
+\item $O_{\mathrm{quant}}$: the output of the certified kernel operating on quantized (INT8 key / INT4 value) data.  This is the system's fast-path output.
 \end{itemize}
 
-All formal bounds in this section certify $\norm{O_{\mathrm{quant}} - O_{\mathrm{ref}}}_2$, i.e.\ quantisation error with the arithmetic path held fixed.  The arithmetic-path gap $\norm{O_{\mathrm{ref}} - O_{\mathrm{dense}}}_2$ is characterised separately in Section~\ref{sec:numerical}.  On fallback (Rungs~3 and~4), the system bypasses the certified kernel entirely and returns $O_{\mathrm{dense}}$, so the worst case is the Dense baseline---not merely $O_{\mathrm{ref}}$.
+All formal bounds in this section certify $\norm{O_{\mathrm{quant}} - O_{\mathrm{ref}}}_2$, i.e.\ quantization error with the arithmetic path held fixed.  The arithmetic-path gap $\norm{O_{\mathrm{ref}} - O_{\mathrm{dense}}}_2$ is characterised separately in Section~\ref{sec:numerical}.  On fallback (Rungs~3 and~4), the system bypasses the certified kernel entirely and returns $O_{\mathrm{dense}}$, so the worst case is the Dense baseline---not merely $O_{\mathrm{ref}}$.
 
-The total quantisation error decomposes into two independent terms via the triangle inequality through the bridge term $\sum_t a_t' V_t$ (quantised-key weights, exact values):
+The total quantization error decomposes into two independent terms via the triangle inequality through the bridge term $\sum_t a_t' V_t$ (quantized-key weights, exact values):
 \begin{align}
 \label{eq:decomp}
   &\norm{O_{\mathrm{quant}} - O_{\mathrm{ref}}}_2
@@ -392,7 +392,7 @@ The total quantisation error decomposes into two independent terms via the trian
   &\quad\leq \underbrace{\norm{\textstyle\sum_t a_t' V_t - \sum_t a_t V_t}_2}_{E_{\mathrm{key}}} \notag \\
   &\quad\;+ \underbrace{\norm{\textstyle\sum_t a_t' \hat{V}_t - \sum_t a_t' V_t}_2}_{E_{\mathrm{val}}}
 \end{align}
-where $a_t$ are the FP16-key softmax weights, $a_t'$ the quantised-key weights, $V_t$ the FP16 values, and $\hat{V}_t$ the quantised values.  $E_{\mathrm{key}}$ measures the effect of key quantisation on the attention distribution with exact values; $E_{\mathrm{val}}$ measures value reconstruction error under the quantised-key distribution.
+where $a_t$ are the FP16-key softmax weights, $a_t'$ the quantized-key weights, $V_t$ the FP16 values, and $\hat{V}_t$ the quantized values.  $E_{\mathrm{key}}$ measures the effect of key quantization on the attention distribution with exact values; $E_{\mathrm{val}}$ measures value reconstruction error under the quantized-key distribution.
 
 Each term has an independent bound, an independent runtime monitor, and an independent escalation path through the fallback ladder.  This independence is practically useful: key compression affects the \emph{attention distribution} (which tokens are attended to), while value compression affects the \emph{output quality} given a fixed distribution.  The two error sources have different characteristics and different remedies.
 
@@ -401,7 +401,7 @@ Each term has an independent bound, an independent runtime monitor, and an indep
 
 \begin{theorem}[Value Compression Error]
 \label{thm:val}
-Let $a_t$ be the softmax attention weights (computed with whatever key precision is in use).  Let $V_t$ be the original FP16 value and $\hat{V}_t$ the quantised value, with $\norm{V_t - \hat{V}_t}_2 \leq \eta$ for all $t$ in the attended set.  Then:
+Let $a_t$ be the softmax attention weights (computed with whatever key precision is in use).  Let $V_t$ be the original FP16 value and $\hat{V}_t$ the quantized value, with $\norm{V_t - \hat{V}_t}_2 \leq \eta$ for all $t$ in the attended set.  Then:
 \begin{equation}
   E_{\mathrm{val}} = \norm{\sum_t a_t \hat{V}_t - \sum_t a_t V_t}_2 \leq \eta
 \end{equation}
@@ -444,7 +444,7 @@ Key compression error is more subtle than value compression error because keys a
 
 \begin{theorem}[Key Compression Error]
 \label{thm:key}
-Let $a_t$ be the exact softmax weights (from FP16 keys) and $a_t'$ the approximate softmax weights (from quantised keys).  Let $V_{\max} = \max_t \norm{V_t}_2$.  Then:
+Let $a_t$ be the exact softmax weights (from FP16 keys) and $a_t'$ the approximate softmax weights (from quantized keys).  Let $V_{\max} = \max_t \norm{V_t}_2$.  Then:
 \begin{equation}
   E_{\mathrm{key}} = \norm{\sum_t a_t' V_t - \sum_t a_t V_t}_2 \leq 2 V_{\max} \cdot \mathrm{TV}(a, a')
 \end{equation}
@@ -460,9 +460,9 @@ where $\mathrm{TV}(a, a') = \frac{1}{2}\sum_t |a_t - a_t'|$ is the total variati
 \end{align*}
 \end{proof}
 
-\textbf{Bounding the total variation.}  The total variation between the exact and approximate softmax distributions depends on the per-token score errors $|\Delta_t| = |s_t - s_t'|$.  We derive the bound for per-channel INT8 quantisation with channel scales $\{\sigma_c\}$.
+\textbf{Bounding the total variation.}  The total variation between the exact and approximate softmax distributions depends on the per-token score errors $|\Delta_t| = |s_t - s_t'|$.  We derive the bound for per-channel INT8 quantization with channel scales $\{\sigma_c\}$.
 
-The per-channel quantisation error satisfies $|k_{t,c} - \hat{k}_{t,c}| \leq \sigma_c / 2$ for each channel $c$.  The score error is:
+The per-channel quantization error satisfies $|k_{t,c} - \hat{k}_{t,c}| \leq \sigma_c / 2$ for each channel $c$.  The score error is:
 \begin{align*}
   |\Delta_t| &= \frac{|q \cdot (k_t - \hat{k}_t)|}{\sqrt{d}} \leq \frac{1}{\sqrt{d}} \sum_{c=1}^d |q_c| \cdot \frac{\sigma_c}{2}
 \end{align*}
@@ -472,9 +472,9 @@ Applying the Cauchy--Schwarz inequality to $\sum_c |q_c| \sigma_c \leq \norm{q}_
   |\Delta_t| \leq \frac{\norm{q}_2 \cdot \norm{\boldsymbol{\sigma}}_2}{2\sqrt{d}} \triangleq \Delta
 \end{equation}
 
-Since scales are per-block (Section~\ref{sec:quant_schemes}), $\Delta$ is strictly per-block: each block $b$ has its own $\Delta_b = \norm{q}_2 \cdot \norm{\boldsymbol{\sigma}^{(b)}}_2 / (2\sqrt{d})$ where $\boldsymbol{\sigma}^{(b)}$ is that block's scale vector.  At runtime, a tighter per-block bound can be computed directly as $\Delta_b = \frac{1}{2\sqrt{d}} \sum_c |q_c| \sigma_c^{(b)}$.  For all downstream bounds (Theorems~\ref{thm:mass} and~\ref{thm:key}, Eq.~\ref{eq:total}), we use the conservative $\Delta_h = \max_{b} \Delta_b$ over all fully-quantised Phase-1--scored blocks for head $h$ (excluding any trailing partial block that remains in FP16).  This is a single scalar per head per step and upper-bounds every block's individual $\Delta_b$.  Crucially, this maximum is taken over \emph{all} scored blocks---not only the tail set $\mathcal{T}$---because the normalised mass bound (Theorem~\ref{thm:mass}) involves a denominator over all blocks.
+Since scales are per-block (Section~\ref{sec:quant_schemes}), $\Delta$ is strictly per-block: each block $b$ has its own $\Delta_b = \norm{q}_2 \cdot \norm{\boldsymbol{\sigma}^{(b)}}_2 / (2\sqrt{d})$ where $\boldsymbol{\sigma}^{(b)}$ is that block's scale vector.  At runtime, a tighter per-block bound can be computed directly as $\Delta_b = \frac{1}{2\sqrt{d}} \sum_c |q_c| \sigma_c^{(b)}$.  For all downstream bounds (Theorems~\ref{thm:mass} and~\ref{thm:key}, Eq.~\ref{eq:total}), we use the conservative $\Delta_h = \max_{b} \Delta_b$ over all fully-quantized Phase-1--scored blocks for head $h$ (excluding any trailing partial block that remains in FP16).  This is a single scalar per head per step and upper-bounds every block's individual $\Delta_b$.  Crucially, this maximum is taken over \emph{all} scored blocks---not only the tail set $\mathcal{T}$---because the normalised mass bound (Theorem~\ref{thm:mass}) involves a denominator over all blocks.
 
-For per-channel quantisation, $\norm{\boldsymbol{\sigma}}_2 = \sqrt{\sum_c \sigma_c^2}$.  When channel scales vary (as they do in practice), this is tighter than the per-block bound $\sqrt{d} \cdot \sigma_{\max}$ because channels with small scales contribute less.  For uniform scales ($\sigma_c = \delta$ for all $c$), the bound reduces to $\Delta = \norm{q}_2 \cdot \delta / 2$, recovering the standard per-block result.
+For per-channel quantization, $\norm{\boldsymbol{\sigma}}_2 = \sqrt{\sum_c \sigma_c^2}$.  When channel scales vary (as they do in practice), this is tighter than the per-block bound $\sqrt{d} \cdot \sigma_{\max}$ because channels with small scales contribute less.  For uniform scales ($\sigma_c = \delta$ for all $c$), the bound reduces to $\Delta = \norm{q}_2 \cdot \delta / 2$, recovering the standard per-block result.
 
 \textbf{Bounding TV from score perturbation.}  The total variation between two softmax distributions whose logits differ by at most $\Delta$ can be bounded directly (Appendix~\ref{app:tv_proof}, Lemma~\ref{lem:tv}).  For softmax distributions $a_t = \exp(s_t) / Z$ and $a_t' = \exp(s_t') / Z'$:
 \begin{equation}
@@ -483,7 +483,7 @@ For per-channel quantisation, $\norm{\boldsymbol{\sigma}}_2 = \sqrt{\sum_c \sigm
 \end{equation}
 This bound is tight, independent of sequence length $N$, and satisfies $\tanh(\Delta) \approx \Delta$ for small $\Delta$.
 
-In the adaptive precision system, the TV bound applies only to the \emph{tail} blocks (those using INT8 keys).  Let $\mathcal{F}$ denote the FP16 set and $\mathcal{T}$ the INT8 tail set.  Since the FP16 blocks have zero key quantisation error, the key compression error decomposes as:
+In the adaptive precision system, the TV bound applies only to the \emph{tail} blocks (those using INT8 keys).  Let $\mathcal{F}$ denote the FP16 set and $\mathcal{T}$ the INT8 tail set.  Since the FP16 blocks have zero key quantization error, the key compression error decomposes as:
 \begin{equation}
   E_{\mathrm{key}} \leq 2 V_{\max} \cdot \mathrm{TV}_{\mathcal{T}}(a, a')
 \end{equation}
@@ -491,12 +491,12 @@ where $\mathrm{TV}_{\mathcal{T}}$ is the total variation restricted to the tail 
 \begin{equation}
   E_{\mathrm{key}} \leq 2 V_{\max} \cdot e^{2\Delta} (1 - \tau_{\mathrm{cov}}) \cdot (e^{2\Delta} - 1)
 \end{equation}
-At $\tau_{\mathrm{cov}} = 0.995$ and $\Delta = 0.18$: $E_{\mathrm{key}} \leq 2 V_{\max} \cdot 1.43 \cdot 0.005 \cdot 0.43 \approx 0.006 V_{\max}$.  The implementation uses INT8$\times$INT8 tensor-core scoring (Section~\ref{sec:scoring}), which introduces a third $\Delta$ from scaled-query quantisation.  The emitted implementation certificate substitutes $e^{3\Delta}$ for $e^{2\Delta}$:
+At $\tau_{\mathrm{cov}} = 0.995$ and $\Delta = 0.18$: $E_{\mathrm{key}} \leq 2 V_{\max} \cdot 1.43 \cdot 0.005 \cdot 0.43 \approx 0.006 V_{\max}$.  The implementation uses INT8$\times$INT8 tensor-core scoring (Section~\ref{sec:scoring}), which introduces a third $\Delta$ from scaled-query quantization.  The emitted implementation certificate substitutes $e^{3\Delta}$ for $e^{2\Delta}$:
 \begin{equation}
 \label{eq:impl_key}
   E_{\mathrm{key}}^{\mathrm{impl}} \leq 2 V_{\max} \cdot e^{3\Delta} (1 - \tau_{\mathrm{cov}}) \cdot (e^{2\Delta} - 1)
 \end{equation}
-At the same operating point this gives $\approx 0.007 V_{\max}$---a 17\% wider bound that accounts for the scoring-path quantisation.
+At the same operating point this gives $\approx 0.007 V_{\max}$---a 17\% wider bound that accounts for the scoring-path quantization.
 
 \textbf{Escalation path.}  When the computed $E_{\mathrm{key}}$ exceeds a configured threshold, the system expands the FP16 set (increasing $\tau_{\mathrm{cov}}$ and reducing the tail mass) or escalates through the fallback ladder.
 
@@ -543,7 +543,7 @@ The identity $\sum_{t \in b}\exp(s_t' - m_{\mathrm{global}}') = S_b \cdot \exp(m
 \end{align}
 Thus, if the INT8-estimated tail mass after selection is $\hat{\alpha}_{\mathcal{T}}$, the corresponding true FP16 tail mass is bounded by $\alpha_{\mathcal{T}} \leq \min\{1,\; e^{2\Delta}\hat{\alpha}_{\mathcal{T}}\}$.  This is the normalised form used in Equation~\eqref{eq:total}.
 
-\textbf{Numerical evaluation.}  For $d = 128$ (LLaMA~3.1-8B), typical per-channel quantisation gives $\Delta \approx 0.18$.  The tight bound is $\exp(2\Delta) \approx 1.43$; the implementation's $\exp(3\Delta)$ substitution gives $\approx 1.72$.
+\textbf{Numerical evaluation.}  For $d = 128$ (LLaMA~3.1-8B), typical per-channel quantization gives $\Delta \approx 0.18$.  The tight bound is $\exp(2\Delta) \approx 1.43$; the implementation's $\exp(3\Delta)$ substitution gives $\approx 1.72$.
 
 \textbf{What the upper bound certifies and what it does not.}  Theorem~\ref{thm:mass} provides a one-sided \emph{upper} bound: the true mass of block $b$ is at most $R_b = e^{2\Delta} \cdot S_b \cdot \exp(m_b' - m_{\mathrm{global}}')$.  This certifies a useful aggregate property: if the selector chooses blocks whose INT8-estimated masses sum to at least $\tau_{\mathrm{cov}}$ of the total INT8-estimated mass, then the true mass of the \emph{unchosen} blocks is at most $e^{2\Delta} (1 - \tau_{\mathrm{cov}})$ of the total true mass.
 
@@ -569,9 +569,9 @@ At $\tau_{\mathrm{cov}} = 0.995$ and $\Delta = 0.18$, and assuming the target is
 
 The error bound~\eqref{eq:total} is valid under four preconditions.  We distinguish between how each is \emph{guaranteed} and how each is \emph{monitored}:
 
-\textbf{P1: Quantisation metadata is current.}  Block scales and offsets must reflect the actual data in the block.  \emph{Guarantee:} deterministic by construction.  Per-block, per-channel scales are computed once at block-fill time (Section~\ref{sec:quant_schemes}) and are immutable thereafter; blocks are never partially overwritten.  Appended tokens remain in FP16 in a trailing partial block until $B$ tokens have arrived, at which point the block is quantised atomically.
+\textbf{P1: Quantization metadata is current.}  Block scales and offsets must reflect the actual data in the block.  \emph{Guarantee:} deterministic by construction.  Per-block, per-channel scales are computed once at block-fill time (Section~\ref{sec:quant_schemes}) and are immutable thereafter; blocks are never partially overwritten.  Appended tokens remain in FP16 in a trailing partial block until $B$ tokens have arrived, at which point the block is quantized atomically.
 
-\textbf{P2: Quantisation error is bounded.}  The per-channel quantisation error for each token must satisfy $|k_{t,c} - \hat{k}_{t,c}| \leq \sigma_c / 2$.  \emph{Guarantee:} deterministic for round-to-nearest quantisation without saturation.  Per-block min/max scales and offsets are chosen at block-fill time as described in Section~\ref{sec:quant_schemes}, so all values used to fit the block are representable; saturation cannot occur unless the stored metadata is corrupted or stale.  \emph{Monitoring:} a small exploration budget (Section~\ref{sec:instability}) spot-checks dequantised values against FP16 originals as a defence-in-depth measure.
+\textbf{P2: Quantization error is bounded.}  The per-channel quantization error for each token must satisfy $|k_{t,c} - \hat{k}_{t,c}| \leq \sigma_c / 2$.  \emph{Guarantee:} deterministic for round-to-nearest quantization without saturation.  Per-block min/max scales and offsets are chosen at block-fill time as described in Section~\ref{sec:quant_schemes}, so all values used to fit the block are representable; saturation cannot occur unless the stored metadata is corrupted or stale.  \emph{Monitoring:} a small exploration budget (Section~\ref{sec:instability}) spot-checks dequantized values against FP16 originals as a defence-in-depth measure.
 
 \textbf{P3: No arithmetic overflow.}  The scoring and softmax computations must not overflow the FP32 accumulator range.  \emph{Guarantee:} deterministic for FP32 accumulators at $d \leq 256$ and typical score magnitudes ($|s_t| \leq d \cdot \max|q| \cdot \max|k| / \sqrt{d} \ll 2^{127}$); verified by standard overflow checks.  All experiments in this paper use FP32 accumulators for the online-softmax scalars ($m$, $\ell$) and output accumulator $o$.
 
@@ -594,7 +594,7 @@ The system never returns an output with unknown or unbounded error.  Both $E_{\m
 \section{Compressed-Domain Execution}
 \label{sec:compressed}
 
-The fused kernel consumes INT8 keys and INT4 values directly, performing dequantisation in registers.  This section analyses why this is preferable to the conventional approach of dequantising to an FP16 staging buffer.
+The fused kernel consumes INT8 keys and INT4 values directly, performing dequantization in registers.  This section analyses why this is preferable to the conventional approach of dequantizing to an FP16 staging buffer.
 
 \subsection{Bandwidth Analysis}
 
@@ -613,7 +613,7 @@ INT8 K + INT4 V (fused) & $1.5d{+}M = 288$ & $0.56\times$ \\
 \end{tabular}
 \end{center}
 
-\noindent where $M_k$ denotes key-only metadata (per-channel scales/offsets) and $M$ the full metadata cost per token.  $M$ comprises: key scales and offsets ($2d \times 4/B = 64$ bytes for per-channel FP32 scale/offset pairs amortised over block size $B{=}16$), value scales and offsets ($2(d/g) \times 2 = 32$ bytes for per-group FP16 scale/offset pairs with $g{=}16$), and per-block value error $\eta_b$ ($4/B \approx 0.25$ bytes, amortised).  Total metadata: $M \approx 96$ bytes/token.  Raw quantised data: $d + d/2 = 192$ bytes/token.  Grand total: 288 bytes/token, or 56\% of FP16---matching the Tier-1 storage cost in Table~\ref{tab:storage}.
+\noindent where $M_k$ denotes key-only metadata (per-channel scales/offsets) and $M$ the full metadata cost per token.  $M$ comprises: key scales and offsets ($2d \times 4/B = 64$ bytes for per-channel FP32 scale/offset pairs amortised over block size $B{=}16$), value scales and offsets ($2(d/g) \times 2 = 32$ bytes for per-group FP16 scale/offset pairs with $g{=}16$), and per-block value error $\eta_b$ ($4/B \approx 0.25$ bytes, amortised).  Total metadata: $M \approx 96$ bytes/token.  Raw quantized data: $d + d/2 = 192$ bytes/token.  Grand total: 288 bytes/token, or 56\% of FP16---matching the Tier-1 storage cost in Table~\ref{tab:storage}.
 
 The fused in-register approach reads 56\% of the data compared to FP16, with no intermediate buffer.  The dequant-to-buffer approach saves on the key read but pays for the buffer write, partially negating the savings.
 
@@ -622,36 +622,36 @@ The fused in-register approach reads 56\% of the data compared to FP16, with no 
 \subsection{Per-Channel Key Scoring}
 \label{sec:scoring}
 
-Computing $q \cdot \hat{k}_t$ with per-channel quantisation expands as:
+Computing $q \cdot \hat{k}_t$ with per-channel quantization expands as:
 \begin{equation}
   q \cdot \hat{k}_t
   = \underbrace{\textstyle\sum_c (q_c \sigma_c)\, k_{t,c}^{\mathrm{int8}}}_{\text{modified dot product}}
   + \underbrace{\textstyle\sum_c q_c z_c}_{\text{const.\ per block}}
 \end{equation}
 
-The second term $\sum_c q_c z_c^{(b)}$ is constant across all tokens within block $b$ (since offsets $z_c^{(b)}$ are per-channel within each block; see Section~\ref{sec:quant_schemes}) and can be precomputed once per block per head per step.  The first term is a standard dot product between the \emph{scaled query} $\tilde{q}_c = q_c \cdot \sigma_c$ and the INT8 key values.  This can be computed using INT8 tensor cores (with the scaled query quantised to INT8) or FP16 (with the scaled query in FP16 and the INT8 keys widened per-element).
+The second term $\sum_c q_c z_c^{(b)}$ is constant across all tokens within block $b$ (since offsets $z_c^{(b)}$ are per-channel within each block; see Section~\ref{sec:quant_schemes}) and can be precomputed once per block per head per step.  The first term is a standard dot product between the \emph{scaled query} $\tilde{q}_c = q_c \cdot \sigma_c$ and the INT8 key values.  This can be computed using INT8 tensor cores (with the scaled query quantized to INT8) or FP16 (with the scaled query in FP16 and the INT8 keys widened per-element).
 
-The choice between INT8 and FP16 scoring affects the scoring precision.  FP16 scoring is exact given the dequantised keys, and the $\Delta$ bound in Equation~\eqref{eq:delta} applies directly with two error sources (score perturbation and global-max shift), yielding $e^{2\Delta}$.  INT8$\times$INT8 tensor core scoring introduces a third error source: quantisation of the scaled query $\tilde{q}$, increasing the mass estimation bound to $e^{3\Delta}$.  This is the mechanism behind the implementation's $e^{3\Delta}$ substitution noted in Theorem~\ref{thm:mass}.
+The choice between INT8 and FP16 scoring affects the scoring precision.  FP16 scoring is exact given the dequantized keys, and the $\Delta$ bound in Equation~\eqref{eq:delta} applies directly with two error sources (score perturbation and global-max shift), yielding $e^{2\Delta}$.  INT8$\times$INT8 tensor core scoring introduces a third error source: quantization of the scaled query $\tilde{q}$, increasing the mass estimation bound to $e^{3\Delta}$.  This is the mechanism behind the implementation's $e^{3\Delta}$ substitution noted in Theorem~\ref{thm:mass}.
 
 
 % =============================================================
 \section{Instability Detection}
 \label{sec:instability}
 
-Beyond the formal error bounds, the system includes runtime checks that detect when the quantised execution is producing anomalous results.
+Beyond the formal error bounds, the system includes runtime checks that detect when the quantized execution is producing anomalous results.
 
-\textbf{Score consistency check.}  During the second pass (FP16 keys for selected blocks), the system compares the FP16 attention scores against the INT8 scores from the first pass.  If any token's score difference exceeds the declared bound, $|s_t^{\mathrm{fp16}} - s_t^{\mathrm{int8}}| > \Delta + \epsilon_{\mathrm{guard}}$, the INT8 quantisation error has exceeded the precondition.  This triggers Rung~4 fallback (full FP16 recomputation) for the affected head.
+\textbf{Score consistency check.}  During the second pass (FP16 keys for selected blocks), the system compares the FP16 attention scores against the INT8 scores from the first pass.  If any token's score difference exceeds the declared bound, $|s_t^{\mathrm{fp16}} - s_t^{\mathrm{int8}}| > \Delta + \epsilon_{\mathrm{guard}}$, the INT8 quantization error has exceeded the precondition.  This triggers Rung~4 fallback (full FP16 recomputation) for the affected head.
 
-\textbf{Exploration budget.}  A small fraction of blocks (1--5\%) are randomly selected for FP16 key execution even when the adaptive selector would not choose them.  The resulting scores are compared against the INT8 estimates, providing ongoing monitoring of the quantisation quality across the full cache, not just the high-mass blocks.  In validation runs across PG-19 (20 chunks $\times$ 4 context lengths) and NIAH (100 trials $\times$ 3 context lengths), the exploration budget detected zero violations---all spot-checked INT8 scores fell within the declared $\Delta + \varepsilon_{\mathrm{guard}}$ bound.  This is expected given P2's deterministic guarantee (Section~\ref{sec:preconditions}); the mechanism exists as defence-in-depth against metadata corruption or hardware fault, not as a routine quality signal.  Quality benchmarks disable the exploration budget for throughput.
+\textbf{Exploration budget.}  A small fraction of blocks (1--5\%) are randomly selected for FP16 key execution even when the adaptive selector would not choose them.  The resulting scores are compared against the INT8 estimates, providing ongoing monitoring of the quantization quality across the full cache, not just the high-mass blocks.  In validation runs across PG-19 (20 chunks $\times$ 4 context lengths) and NIAH (100 trials $\times$ 3 context lengths), the exploration budget detected zero violations---all spot-checked INT8 scores fell within the declared $\Delta + \varepsilon_{\mathrm{guard}}$ bound.  This is expected given P2's deterministic guarantee (Section~\ref{sec:preconditions}); the mechanism exists as defence-in-depth against metadata corruption or hardware fault, not as a routine quality signal.  Quality benchmarks disable the exploration budget for throughput.
 
-\textbf{Value error annotations.}  Each block's maximum per-token reconstruction error $\eta_b$ is computed at quantisation time and stored as a one-float annotation in VRAM\@.  At attend time, the runtime computes the tight per-head value error $E_{\mathrm{val}}^{(h)} = \sum_b \rho_b^{(h)} \eta_b$ (Corollary~\ref{cor:val_block}).  The default policy promotes blocks where the local contribution estimate $\hat{\rho}_b \cdot \eta_b > v_{\mathrm{tol}}$ to FP16 values from Tier~2; the achieved $E_{\mathrm{val}}^{(h)}$ after promotion is then reported as part of the per-step certificate.  For hard-budget deployments, the same annotations support greedy promotion until the achieved $E_{\mathrm{val}}^{(h)}$ is below a configured global threshold.  This avoids the need for runtime spot-checks against FP16 originals.
+\textbf{Value error annotations.}  Each block's maximum per-token reconstruction error $\eta_b$ is computed at quantization time and stored as a one-float annotation in VRAM\@.  At attend time, the runtime computes the tight per-head value error $E_{\mathrm{val}}^{(h)} = \sum_b \rho_b^{(h)} \eta_b$ (Corollary~\ref{cor:val_block}).  The default policy promotes blocks where the local contribution estimate $\hat{\rho}_b \cdot \eta_b > v_{\mathrm{tol}}$ to FP16 values from Tier~2; the achieved $E_{\mathrm{val}}^{(h)}$ after promotion is then reported as part of the per-step certificate.  For hard-budget deployments, the same annotations support greedy promotion until the achieved $E_{\mathrm{val}}^{(h)}$ is below a configured global threshold.  This avoids the need for runtime spot-checks against FP16 originals.
 
-These checks are not necessary for the formal bounds to hold---the bounds are valid by construction.  They provide defence in depth: catching cases where the quantisation parameters are stale, the cache has been corrupted, or the hardware is producing unexpected results.
+These checks are not necessary for the formal bounds to hold---the bounds are valid by construction.  They provide defence in depth: catching cases where the quantization parameters are stale, the cache has been corrupted, or the hardware is producing unexpected results.
 
 \subsection{Ranking-Consistency Check}
 \label{sec:ranking_consistency}
 
-The adaptive top-$K$ selector uses INT8 scores (Phase~1) to determine which blocks receive FP16 keys in Phase~2.  This creates a subtle vulnerability: the INT8 ranking may not match the true FP16 ranking.  For two blocks with similar true scores, INT8 quantisation noise ($\sim$0.4\% mean per-channel error) can swap their ordering.  The formal mass bound (Theorem~\ref{thm:mass}) guarantees that the \emph{aggregate} tail mass is small, but does not guarantee that the \emph{ranking} within the top-$K^*$ is correct.
+The adaptive top-$K$ selector uses INT8 scores (Phase~1) to determine which blocks receive FP16 keys in Phase~2.  This creates a subtle vulnerability: the INT8 ranking may not match the true FP16 ranking.  For two blocks with similar true scores, INT8 quantization noise ($\sim$0.4\% mean per-channel error) can swap their ordering.  The formal mass bound (Theorem~\ref{thm:mass}) guarantees that the \emph{aggregate} tail mass is small, but does not guarantee that the \emph{ranking} within the top-$K^*$ is correct.
 
 When the ranking is wrong, the consequences are task-dependent.  For language modelling (where quality depends on the aggregate attention distribution), ranking errors on similar-mass blocks are benign---the output perturbation is within the certified bound.  For retrieval tasks (where a single needle token must receive concentrated attention), ranking errors can matter: if a high-mass block is demoted to INT8 while a lower-mass block is promoted to FP16, the resulting mixed-precision softmax distribution may differ from the all-FP16 distribution in ways that affect the argmax over output logits.
 
@@ -683,17 +683,17 @@ then the ranking certificate cannot be issued for that head, and the system esca
 
 \subsection{KV Cache Compression}
 
-\textbf{KVQuant}~\cite{kvquant} achieves sub-4-bit KV quantisation via per-channel key quantisation, establishing the per-channel technique we adopt for keys.  \textbf{KIVI}~\cite{kivi} demonstrates tuning-free asymmetric 2-bit quantisation with the key observation that keys and values have different quantisation sensitivities, an observation central to our asymmetric INT8/INT4 design.  \textbf{QJL}~\cite{qjl} uses Johnson--Lindenstrauss projections followed by sign-bit quantisation for low-overhead KV representations.  \textbf{InnerQ}~\cite{innerq} introduces hardware-aware group-wise quantisation along the inner dimension, with hybrid quantisation and high-precision windows for recent and sink tokens.
+\textbf{KVQuant}~\cite{kvquant} achieves sub-4-bit KV quantization via per-channel key quantization, establishing the per-channel technique we adopt for keys.  \textbf{KIVI}~\cite{kivi} demonstrates tuning-free asymmetric 2-bit quantization with the key observation that keys and values have different quantization sensitivities, an observation central to our asymmetric INT8/INT4 design.  \textbf{QJL}~\cite{qjl} uses Johnson--Lindenstrauss projections followed by sign-bit quantization for low-overhead KV representations.  \textbf{InnerQ}~\cite{innerq} introduces hardware-aware group-wise quantization along the inner dimension, with hybrid quantization and high-precision windows for recent and sink tokens.
 
-These systems treat compression as a storage optimisation: at decode time, compressed values are typically widened to FP16 before the attention kernel consumes them.  Production serving frameworks (vLLM, TensorRT-LLM) now support FP8 KV caches with quantised-domain execution via FlashAttention-3, demonstrating that compressed-domain attention is practical at scale.
+These systems treat compression as a storage optimisation: at decode time, compressed values are typically widened to FP16 before the attention kernel consumes them.  Production serving frameworks (vLLM, TensorRT-LLM) now support FP8 KV caches with quantized-domain execution via FlashAttention-3, demonstrating that compressed-domain attention is practical at scale.
 
-Recent work pushes compression further.  \textbf{TurboQuant}~\cite{turboquant} provides theoretically grounded online vector quantisation applicable to KV caches.  \textbf{JanusQuant}~\cite{janusquant} demonstrates accurate 2-bit KV cache quantisation for long-context inference.  \textbf{PackInfer}~\cite{packinfer} targets compute/IO-efficient attention kernels for packed quantised caches in batched serving.  These optimise compression ratio and throughput; our contribution is orthogonal: runtime certification and exact fallback rather than more aggressive compression.
+Recent work pushes compression further.  \textbf{TurboQuant}~\cite{turboquant} provides theoretically grounded online vector quantization applicable to KV caches.  \textbf{JanusQuant}~\cite{janusquant} demonstrates accurate 2-bit KV cache quantization for long-context inference.  \textbf{PackInfer}~\cite{packinfer} targets compute/IO-efficient attention kernels for packed quantized caches in batched serving.  These optimise compression ratio and throughput; our contribution is orthogonal: runtime certification and exact fallback rather than more aggressive compression.
 
 \subsection{Compressed-Domain Execution}
 
-\textbf{HACK}~\cite{hack} eliminates the dequantisation staging buffer by computing attention directly on quantised KV data, achieving significant JCT reduction.  \textbf{VecInfer}~\cite{vecinfer} fuses dequantisation and attention into a single CUDA kernel.  \textbf{FlashInfer}~\cite{flashinfer} provides infrastructure for page-organised KV caches with fused attention kernels.
+\textbf{HACK}~\cite{hack} eliminates the dequantization staging buffer by computing attention directly on quantized KV data, achieving significant JCT reduction.  \textbf{VecInfer}~\cite{vecinfer} fuses dequantization and attention into a single CUDA kernel.  \textbf{FlashInfer}~\cite{flashinfer} provides infrastructure for page-organised KV caches with fused attention kernels.
 
-Our work builds on this line but adds the formal error analysis and the tiered fallback architecture.  Existing compressed-domain systems commit to a single quantisation level; our system adapts per block per step, with full-precision data available for escalation.  \textbf{QServe}~\cite{qserve} is a W4A8KV4 serving system with fused attention and SmoothAttention for KV4 accuracy; it demonstrates that aggressive quantisation (including KV4) is viable for throughput-oriented deployment, but provides no per-step error visibility or fallback path.  \textbf{PQCache}~\cite{pqcache} frames KV cache as approximate retrieval via product quantisation, selecting important tokens per step; it contrasts with our approach in that PQCache uses approximate retrieval without error bounds, while we provide per-step certificates and deterministic FP16 fallback.
+Our work builds on this line but adds the formal error analysis and the tiered fallback architecture.  Existing compressed-domain systems commit to a single quantization level; our system adapts per block per step, with full-precision data available for escalation.  \textbf{QServe}~\cite{qserve} is a W4A8KV4 serving system with fused attention and SmoothAttention for KV4 accuracy; it demonstrates that aggressive quantization (including KV4) is viable for throughput-oriented deployment, but provides no per-step error visibility or fallback path.  \textbf{PQCache}~\cite{pqcache} frames KV cache as approximate retrieval via product quantization, selecting important tokens per step; it contrasts with our approach in that PQCache uses approximate retrieval without error bounds, while we provide per-step certificates and deterministic FP16 fallback.
 
 \subsection{Adaptive Precision}
 
@@ -703,7 +703,7 @@ Our work builds on this line but adds the formal error analysis and the tiered f
 
 The broader sparse-attention literature offers several complementary approaches to reducing attention cost: \textbf{BLASST}~\cite{blasst} uses block-level adaptive structured sparsity, \textbf{PSA}~\cite{psa} applies progressive sparse selection, \textbf{Twilight}~\cite{twilight} introduces hierarchical top-$p$ pruning, \textbf{SpargeAttn}~\cite{spargeattn} accelerates inference via accurate sparse approximation, \textbf{H$_2$O}~\cite{h2o} identifies heavy-hitter tokens for cache eviction, and \textbf{StreamingLLM}~\cite{streamingattn} maintains attention sinks for unbounded-length streaming.  These methods reduce computation or memory by selecting or evicting tokens; our work is orthogonal in that it retains all tokens but reduces their \emph{precision}, with runtime bounds on the resulting error.
 
-Prior work on certified or analyzable sparse attention derives total-variation bounds for top-$k$ token selection, including blockwise mass certificates for pruning decisions~\cite{certifiedtopk}.  Our error decomposition differs in that it bounds output perturbation from \emph{quantisation} (not token eviction), decomposes key compression and value compression independently, and provides an unconditional FP16 fallback rather than a statistical guarantee.
+Prior work on certified or analyzable sparse attention derives total-variation bounds for top-$k$ token selection, including blockwise mass certificates for pruning decisions~\cite{certifiedtopk}.  Our error decomposition differs in that it bounds output perturbation from \emph{quantization} (not token eviction), decomposes key compression and value compression independently, and provides an unconditional FP16 fallback rather than a statistical guarantee.
 
 \subsection{KV Cache Memory Management}
 
@@ -711,11 +711,11 @@ Prior work on certified or analyzable sparse attention derives total-variation b
 
 \subsection{Positioning Summary}
 
-Table~\ref{tab:positioning} situates this work relative to representative KV-cache quantisation and serving systems.  The distinguishing feature is the combination of runtime error bounds and unconditional dense fallback; other systems offer better throughput or lower bit-widths but provide no per-step error visibility or FP16 recovery path.
+Table~\ref{tab:positioning} situates this work relative to representative KV-cache quantization and serving systems.  The distinguishing feature is the combination of runtime error bounds and unconditional dense fallback; other systems offer better throughput or lower bit-widths but provide no per-step error visibility or FP16 recovery path.
 
 \begin{table*}[!t]
 \centering
-\caption{Positioning against representative KV-cache systems.  ``Error bound'' = per-step runtime bound on quantisation error.  ``Dense fallback'' = mechanism to return exact FP16 attention output when quality degrades.  ``Precision'' = KV storage format.}
+\caption{Positioning against representative KV-cache systems.  ``Error bound'' = per-step runtime bound on quantization error.  ``Dense fallback'' = mechanism to return exact FP16 attention output when quality degrades.  ``Precision'' = KV storage format.}
 \label{tab:positioning}
 \small
 \begin{tabular}{lcccc}
@@ -741,7 +741,7 @@ This work & INT8K/INT4V & runtime & layerwise FP16 & per-block/step \\
 \section{Experimental Setup}
 \label{sec:setup}
 
-\textbf{Model.}  LLaMA~3.1-8B (base; \texttt{NousResearch/Meta-Llama-3.1-8B}) with INT8 model weights (via \texttt{bitsandbytes} 8-bit quantisation), the standard production configuration for single-GPU deployment.
+\textbf{Model.}  LLaMA~3.1-8B (base; \texttt{NousResearch/Meta-Llama-3.1-8B}) with INT8 model weights (via \texttt{bitsandbytes} 8-bit quantization), the standard production configuration for single-GPU deployment.
 
 \textbf{Hardware.}  All experiments use a single NVIDIA RTX~PRO~6000~WS (96\,GB VRAM, Blackwell architecture) with pinned system RAM for Tier~2 storage.  Quality benchmarks (PG-19, NIAH, RULER) were distributed across multiple machines with identical GPUs but varying CPU and memory configurations; quality results depend only on the GPU compute path and are numerically reproducible across hosts.  Performance benchmarks (Section~\ref{sec:performance}) were run on a single dedicated machine: AMD EPYC~9534 (64-core), 221\,GB system RAM, PCIe~5.0 $\times$16 to the GPU.
 
@@ -784,7 +784,7 @@ Tier-2 & full FP16 KV & Pinned system RAM; required for Rung~3/4 fallback \\
 \section{Results}
 \label{sec:results}
 
-All results compare two configurations on the same hardware, prompts, and seeds: \textbf{Dense} (FP16 KV cache, the production baseline) and \textbf{Certified} (tiered quantised KV cache with adaptive precision selection and runtime fallback).  Both use INT8 model weights.
+All results compare two configurations on the same hardware, prompts, and seeds: \textbf{Dense} (FP16 KV cache, the production baseline) and \textbf{Certified} (tiered quantized KV cache with adaptive precision selection and runtime fallback).  Both use INT8 model weights.
 
 \textbf{Critical failures} are paired trials where dense succeeds and certified fails on the same prompt; \textbf{reverse discordant} pairs are the converse (dense fails, certified succeeds).  For RULER, critical failures are counted per subtask trial within each slice.  These discordant pairs form the $2\times 2$ contingency table used by the McNemar test (Section~\ref{sec:niah}).
 
@@ -794,7 +794,7 @@ Table~\ref{tab:summary} presents the headline quality results across all three b
 
 \begin{table*}[!t]
 \centering
-\caption{Headline quality deltas: certified quantised attention vs.\ dense FP16 attention (LLaMA~3.1-8B).  $\Delta$ = Certified $-$ Dense; positive means certified is better.  All results use asymmetric INT8 keys, INT4 values ($g{=}16$), FP32 accumulators, $k_{\max}{=}128$, $\tau_{\mathrm{cov}}{=}0.995$, $v_{\mathrm{tol}}{=}0.05$.}
+\caption{Headline quality deltas: certified quantized attention vs.\ dense FP16 attention (LLaMA~3.1-8B).  $\Delta$ = Certified $-$ Dense; positive means certified is better.  All results use asymmetric INT8 keys, INT4 values ($g{=}16$), FP32 accumulators, $k_{\max}{=}128$, $\tau_{\mathrm{cov}}{=}0.995$, $v_{\mathrm{tol}}{=}0.05$.}
 \label{tab:summary}
 \small
 \begin{tabular}{llrrrrl}
@@ -810,12 +810,12 @@ RULER & $\Delta$ accuracy & $-0.069$ & $-0.019$ & $+0.015$ & $+0.004$ & 20 slice
 {\footnotesize \textsuperscript{$\dagger$}128K NIAH omitted: the base model scores 0\% on dense at this context length (retrieval exceeds the model's capability).}
 \end{table*}
 
-\subsection{Naive Quantised Baseline}
+\subsection{Naive Quantized Baseline}
 \label{sec:naive}
 
-To isolate the contribution of the certification and fallback machinery, we evaluate a \textbf{naive INT8K/INT4V} baseline: the same quantisation format (INT8 per-channel keys, INT4 $g{=}16$ values) but with all certification disabled---no adaptive top-$K$ promotion ($K_{\max}{=}0$, $\tau_{\mathrm{cov}}{=}0$), no value promotion ($v_{\mathrm{tol}}$ effectively infinite), no ranking-consistency check, no fallback ladder, and no FP16 scratch cache.  The model and prompts are identical.
+To isolate the contribution of the certification and fallback machinery, we evaluate a \textbf{naive INT8K/INT4V} baseline: the same quantization format (INT8 per-channel keys, INT4 $g{=}16$ values) but with all certification disabled---no adaptive top-$K$ promotion ($K_{\max}{=}0$, $\tau_{\mathrm{cov}}{=}0$), no value promotion ($v_{\mathrm{tol}}$ effectively infinite), no ranking-consistency check, no fallback ladder, and no FP16 scratch cache.  The model and prompts are identical.
 
-Table~\ref{tab:naive} shows the three-way comparison.  Without certification, INT8K/INT4V quantisation degrades retrieval and structured reasoning substantially.  On standalone NIAH (100 paired trials per context length), naive accuracy drops to 5--10\% versus 39--66\% for dense, with McNemar $p < 10^{-9}$ at every context length.  The certified system matches dense at all three.  On RULER (10 slices, 70 trials per context length), naive RULER drops by $-44$ to $-56$pp across all context lengths, with every subtask affected: VT scores 0\% at every context length, CWE drops to near-zero, and even NIAH retrieval variants within RULER lose $-20$ to $-78$pp.  The certified system recovers nearly all of this, with a worst-case gap of $-6.9$pp at 8K localised to value-sensitive subtasks.
+Table~\ref{tab:naive} shows the three-way comparison.  Without certification, INT8K/INT4V quantization degrades retrieval and structured reasoning substantially.  On standalone NIAH (100 paired trials per context length), naive accuracy drops to 5--10\% versus 39--66\% for dense, with McNemar $p < 10^{-9}$ at every context length.  The certified system matches dense at all three.  On RULER (10 slices, 70 trials per context length), naive RULER drops by $-44$ to $-56$pp across all context lengths, with every subtask affected: VT scores 0\% at every context length, CWE drops to near-zero, and even NIAH retrieval variants within RULER lose $-20$ to $-78$pp.  The certified system recovers nearly all of this, with a worst-case gap of $-6.9$pp at 8K localised to value-sensitive subtasks.
 
 \begin{table}[ht]
 \centering
@@ -841,9 +841,9 @@ Latency (ms) & 64K  & 63.2  & 244.3 & 260.0 \\
 \end{tabular}
 \end{table}
 
-The naive baseline's failure pattern is consistent with INT8 key quantisation noise corrupting the softmax attention distribution: the model generates plausible English but cannot locate specific stored information.  On a representative 64K NIAH trial, the dense system correctly retrieves ``The secret project codename is Crimson Falcon'' while the naive system generates ``The history of the history of the history of mathematics?''---coherent language, but with the needle content entirely lost.  At 8K, 31 of 39 dense-only successes have zero matching naive-only successes (discordant ratio 31:0), confirming that the failures are systematic, not random.
+The naive baseline's failure pattern is consistent with INT8 key quantization noise corrupting the softmax attention distribution: the model generates plausible English but cannot locate specific stored information.  On a representative 64K NIAH trial, the dense system correctly retrieves ``The secret project codename is Crimson Falcon'' while the naive system generates ``The history of the history of the history of mathematics?''---coherent language, but with the needle content entirely lost.  At 8K, 31 of 39 dense-only successes have zero matching naive-only successes (discordant ratio 31:0), confirming that the failures are systematic, not random.
 
-The naive results demonstrate that the certification and fallback machinery is not merely monitoring overhead: it is the mechanism by which the system preserves retrieval and structured-reasoning quality under INT8K/INT4V quantisation.  The naive PG-19 baseline is omitted: retrieval and structured reasoning are the stress cases for quantised attention, and the certified system's PG-19 results (Table~\ref{tab:pg19}) already show that perplexity is robust to INT8K/INT4V quantisation with negligible fallback activity---the failure mode that certification prevents is attention-distribution corruption, which manifests on retrieval tasks, not on next-token prediction over broad text.
+The naive results demonstrate that the certification and fallback machinery is not merely monitoring overhead: it is the mechanism by which the system preserves retrieval and structured-reasoning quality under INT8K/INT4V quantization.  The naive PG-19 baseline is omitted: retrieval and structured reasoning are the stress cases for quantized attention, and the certified system's PG-19 results (Table~\ref{tab:pg19}) already show that perplexity is robust to INT8K/INT4V quantization with negligible fallback activity---the failure mode that certification prevents is attention-distribution corruption, which manifests on retrieval tasks, not on next-token prediction over broad text.
 
 \subsection{PG-19 Perplexity}
 
@@ -976,7 +976,7 @@ FP16 values       & $+0.000$ & $-0.030$ & $+0.000$ & $-0.004$ & 0/70  & $[-0.013
 \end{tabular}
 \end{table*}
 
-This confirms the \textbf{value-side hypothesis}: the 8K RULER gap is caused by INT4 value reconstruction error at group size $g{=}16$, not by key quantisation or the attention mechanism.  The affected subtasks (VT, CWE, FWE) require precise value content---variable tracking must reconstruct exact variable assignments, and word extraction must match exact character sequences.  At 8K, the context is short enough that the model baseline is nearly perfect (dense ${\geq}0.9$ on VT and CWE), so INT4 value noise that would be masked by baseline difficulty at longer contexts becomes visible.  This effect diminishes at longer contexts where the dense baseline itself drops and the quantisation noise is small relative to the intrinsic task difficulty; at 32K a mild residual ($\Delta{=}{-}0.019$) remains on CWE, while at 64K+ the effect is undetectable.
+This confirms the \textbf{value-side hypothesis}: the 8K RULER gap is caused by INT4 value reconstruction error at group size $g{=}16$, not by key quantization or the attention mechanism.  The affected subtasks (VT, CWE, FWE) require precise value content---variable tracking must reconstruct exact variable assignments, and word extraction must match exact character sequences.  At 8K, the context is short enough that the model baseline is nearly perfect (dense ${\geq}0.9$ on VT and CWE), so INT4 value noise that would be masked by baseline difficulty at longer contexts becomes visible.  This effect diminishes at longer contexts where the dense baseline itself drops and the quantization noise is small relative to the intrinsic task difficulty; at 32K a mild residual ($\Delta{=}{-}0.019$) remains on CWE, while at 64K+ the effect is undetectable.
 
 \textbf{Why the value error bound does not catch this.}  The value certificate (Section~\ref{sec:val_error}) reports $E_{\mathrm{val}} = \sum_b \rho_b \eta_b$ per head per step.  The default $v_{\mathrm{tol}}{=}0.05$ policy is a local promotion heuristic: it promotes blocks whose estimated local contribution $\hat{\rho}_b \eta_b$ exceeds the threshold, but does not by itself enforce a global $E_{\mathrm{val}} \leq 0.05$ budget.  In practice the observed $E_{\mathrm{val}}$ remains near the configured tolerance (Table~\ref{tab:telemetry}), so the system does \emph{not} escalate to FP16 values.  The per-step value error is small---the issue is that it does not compose across layers or autoregressive steps.  Small per-step errors accumulate through the residual stream (32 heads $\times$ 32 layers per step, then across decode steps), and the compounded drift is sufficient to flip marginal logits on tasks that demand exact character-level reconstruction.  At 8K, the dense model's high confidence on VT/CWE leaves moderate logit margins; the accumulated value noise pushes enough tokens past the decision boundary to produce the observed $-6.9$pp gap.  At 32K+, the logit margins on these same subtasks are already narrow (dense accuracy drops below 0.6), so the same magnitude of compounded noise does not change the outcome.
 
@@ -1021,7 +1021,7 @@ Table~\ref{tab:telemetry} reports the runtime certificate values across RULER ev
 
 \begin{table*}[!t]
 \centering
-\caption{Runtime certificate statistics across RULER evaluations (7-subtask subset).  \textbf{Important}: these are \emph{pre-fallback candidate} bounds, computed before the fallback ladder acts.  For heads where Rung~3 triggered (Table~\ref{tab:fallback_counts}), the system returned $O_{\mathrm{dense}}$ (zero quantisation error relative to the dense path), so the high-$E_{\mathrm{key}}$ max values were never part of the returned output's certificate.  Each evaluation record stores two summaries per step: \texttt{e\_key\_step\_mean} (mean $E_{\mathrm{key}}$ across all head-layer pairs) and \texttt{e\_key\_step\_max} (worst-case head-layer pair).  The ``med'' and ``p95'' columns report quantiles of the per-step mean across all records; the ``max'' column reports the maximum of the per-step \emph{max}, i.e.\ the single worst head-layer-step candidate bound at that context length.  $E_{\mathrm{val}}$ columns follow the same convention.  $E_{\mathrm{val}}$ max saturates at $v_{\mathrm{tol}}{=}0.05$ because the local per-block promotion heuristic (Rung~2) catches high-contribution blocks individually (see Section~\ref{sec:telemetry}).}
+\caption{Runtime certificate statistics across RULER evaluations (7-subtask subset).  \textbf{Important}: these are \emph{pre-fallback candidate} bounds, computed before the fallback ladder acts.  For heads where Rung~3 triggered (Table~\ref{tab:fallback_counts}), the system returned $O_{\mathrm{dense}}$ (zero quantization error relative to the dense path), so the high-$E_{\mathrm{key}}$ max values were never part of the returned output's certificate.  Each evaluation record stores two summaries per step: \texttt{e\_key\_step\_mean} (mean $E_{\mathrm{key}}$ across all head-layer pairs) and \texttt{e\_key\_step\_max} (worst-case head-layer pair).  The ``med'' and ``p95'' columns report quantiles of the per-step mean across all records; the ``max'' column reports the maximum of the per-step \emph{max}, i.e.\ the single worst head-layer-step candidate bound at that context length.  $E_{\mathrm{val}}$ columns follow the same convention.  $E_{\mathrm{val}}$ max saturates at $v_{\mathrm{tol}}{=}0.05$ because the local per-block promotion heuristic (Rung~2) catches high-contribution blocks individually (see Section~\ref{sec:telemetry}).}
 \label{tab:telemetry}
 \small
 \begin{tabular}{lrrrrrrr}
@@ -1038,7 +1038,7 @@ Table~\ref{tab:telemetry} reports the runtime certificate values across RULER ev
 \end{tabular}
 \end{table*}
 
-$E_{\mathrm{key}}$ increases with context length as expected: longer contexts have more tail blocks scored in INT8, and the worst-case head encounters higher cumulative quantisation shift.  The median-to-max ratio (${\sim}70\times$ at 8K, ${\sim}46\times$ at 128K) reflects the heavy-tailed distribution of key error across heads and steps---most heads have small error, but a few retrieval-critical heads produce large bounds.  These high-$E_{\mathrm{key}}$ steps are precisely where the ranking-consistency check (Rung~3) triggers fallback, returning $O_{\mathrm{dense}}$ for the affected head.
+$E_{\mathrm{key}}$ increases with context length as expected: longer contexts have more tail blocks scored in INT8, and the worst-case head encounters higher cumulative quantization shift.  The median-to-max ratio (${\sim}70\times$ at 8K, ${\sim}46\times$ at 128K) reflects the heavy-tailed distribution of key error across heads and steps---most heads have small error, but a few retrieval-critical heads produce large bounds.  These high-$E_{\mathrm{key}}$ steps are precisely where the ranking-consistency check (Rung~3) triggers fallback, returning $O_{\mathrm{dense}}$ for the affected head.
 
 $E_{\mathrm{val}}$ is stable across context lengths (median 0.023--0.038), with the maximum capped at $v_{\mathrm{tol}}{=}0.050$ by the Rung~2 promotion policy.  This cap reflects the \emph{local} per-block heuristic ($\hat{\rho}_b \eta_b > v_{\mathrm{tol}}$ triggers promotion for block $b$), not a global value-error budget: the system does not greedily promote blocks until $\sum_b \rho_b \eta_b \leq \varepsilon_{\mathrm{val}}$.  The achieved $E_{\mathrm{val}}{=}\sum_b \rho_b \eta_b$ is reported in the telemetry and happens to stay near $v_{\mathrm{tol}}$ because the heuristic catches high-contribution blocks individually, but this is an empirical observation, not a formal guarantee.
 
@@ -1048,7 +1048,7 @@ Interpretation: most steps have small candidate error, but a small number of ret
 
 \begin{table*}[!t]
 \centering
-\caption{Candidate vs.\ returned certificate summary at 64K (RULER, 140 evaluation records, 128{,}000 head-steps each).  ``Candidate'' is the pre-fallback bound; ``Returned'' reflects the output actually delivered.  For head-steps where Rung~3 fired (1.2--2.2\%), the system returned $O_{\mathrm{dense}}$ with zero quantisation error; the returned $E_{\mathrm{key}}$ for those head-steps is 0 by construction.  For the remaining 97.8--98.8\% of head-steps, the returned bound equals the candidate bound.}
+\caption{Candidate vs.\ returned certificate summary at 64K (RULER, 140 evaluation records, 128{,}000 head-steps each).  ``Candidate'' is the pre-fallback bound; ``Returned'' reflects the output actually delivered.  For head-steps where Rung~3 fired (1.2--2.2\%), the system returned $O_{\mathrm{dense}}$ with zero quantization error; the returned $E_{\mathrm{key}}$ for those head-steps is 0 by construction.  For the remaining 97.8--98.8\% of head-steps, the returned bound equals the candidate bound.}
 \label{tab:returned_cert}
 \small
 \begin{tabular}{lrrrr}
@@ -1067,7 +1067,7 @@ Dense fallback rate & \multicolumn{4}{c}{1.2\% (PG-19) / 2.2\% (NIAH) of head-st
 {\footnotesize \textsuperscript{$\ast$}The max returned $E_{\mathrm{key}}$ is bounded by the candidate p95 because head-steps with extreme candidate bounds are precisely those where Rung~3 triggers, replacing the output with $O_{\mathrm{dense}}$ (returned $E_{\mathrm{key}}{=}0$).  The exact max returned value is $\leq$ the candidate p95 but the current telemetry does not separately log post-fallback per-head bounds; the returned columns are inferred from the candidate distribution and fallback rate.  Logging actual returned certificates per head-step is a planned instrumentation improvement.}
 \end{table*}
 
-The key takeaway is that the large candidate max values (e.g.\ $E_{\mathrm{key}}{=}13.648$ at 64K) are never part of the returned output: the fallback ladder intercepts them.  The returned output is either certified within the p95 candidate envelope or is the dense FP16 result with zero quantisation error.
+The key takeaway is that the large candidate max values (e.g.\ $E_{\mathrm{key}}{=}13.648$ at 64K) are never part of the returned output: the fallback ladder intercepts them.  The returned output is either certified within the p95 candidate envelope or is the dense FP16 result with zero quantization error.
 
 \subsection{Storage Analysis}
 \label{sec:storage}
@@ -1099,7 +1099,7 @@ Value $\eta_b$     & $<1$ & & 1 float per block, amortised over $B$ tokens \\
 \end{tabular}
 \end{table*}
 
-The Tier~1 VRAM cost is approximately 56\% of dense FP16, a 44\% VRAM reduction.  The metadata overhead (scales and offsets) is significant---64 bytes per token for key metadata alone---but is amortised across the block and is the price of per-channel quantisation quality.  The total memory footprint (VRAM + system RAM) is 288 + 512 = 800 bytes/token/head, or 156\% of dense---the system trades system RAM for VRAM, which is the scarcer resource.
+The Tier~1 VRAM cost is approximately 56\% of dense FP16, a 44\% VRAM reduction.  The metadata overhead (scales and offsets) is significant---64 bytes per token for key metadata alone---but is amortised across the block and is the price of per-channel quantization quality.  The total memory footprint (VRAM + system RAM) is 288 + 512 = 800 bytes/token/head, or 156\% of dense---the system trades system RAM for VRAM, which is the scarcer resource.
 
 The Tier-1 savings are context-independent at 44\%.  For example, at 128K context (32 layers, 8 KV heads, $d{=}128$): dense FP16 KV requires ${\sim}16$\,GB; Tier-1 requires ${\sim}9$\,GB.  However, the Tier-2 system RAM cost (FP16 originals for fallback) equals the dense size, and the runtime FP16 key scratch buffer further reduces the effective savings (see below).
 
@@ -1412,7 +1412,7 @@ The union analysis reveals that with a position-corpus-capacity scratch buffer, 
 
 \begin{table*}[!t]
 \centering
-\caption{Measured memory usage (LLaMA~3.1-8B, 2048-block scratch cache).  Tier-1 stores quantised KV; scratch is fixed-size FP16 cache for promoted blocks; Tier-2 (system RAM) stores FP16 originals for fallback.  Total VRAM = Tier-1 + scratch.  At 128K, the certified system uses 18\% less VRAM than dense.}
+\caption{Measured memory usage (LLaMA~3.1-8B, 2048-block scratch cache).  Tier-1 stores quantized KV; scratch is fixed-size FP16 cache for promoted blocks; Tier-2 (system RAM) stores FP16 originals for fallback.  Total VRAM = Tier-1 + scratch.  At 128K, the certified system uses 18\% less VRAM than dense.}
 \label{tab:memory}
 \small
 \begin{tabular}{rrrrrr}
@@ -1443,14 +1443,14 @@ For language modelling, this difference is negligible---it vanishes into the per
 
 All quality results in this paper use FP32 online-softmax accumulators.  A development experiment with FP64 scalar accumulators ($m$, $\ell$ in FP64, output accumulator $o$ in FP32) recovered $\sim$2pp on NIAH 8K (Table~\ref{tab:niah_ablation}), but the FP32 path was sufficient for all reported quality metrics and is what the retained run artifacts use.  FP64 scalar accumulation remains available as an option for deployments where the arithmetic-path gap is a concern.
 
-The remaining $\sim$4pp gap is attributable to differences in the matmul path (certified kernel vs.\ Flash Attention tensor cores), not the quantisation scheme.  A tensor-core-native certified kernel that matched Flash Attention's rounding may reduce this gap, though the magnitude of any residual is unknown without implementation.  This does not affect the certification guarantee: Rung~3/4 fallbacks bypass the certified kernel entirely and call \torchsdpa{} (Section~\ref{sec:fallback}).
+The remaining $\sim$4pp gap is attributable to differences in the matmul path (certified kernel vs.\ Flash Attention tensor cores), not the quantization scheme.  A tensor-core-native certified kernel that matched Flash Attention's rounding may reduce this gap, though the magnitude of any residual is unknown without implementation.  This does not affect the certification guarantee: Rung~3/4 fallbacks bypass the certified kernel entirely and call \torchsdpa{} (Section~\ref{sec:fallback}).
 
 
 % =============================================================
 \section{Discussion}
 \label{sec:discussion}
 
-The primary contribution of this work is not compression itself---KV cache quantisation is well-established---but the \emph{certification framing}: formal per-head, per-step error bounds coupled with runtime monitoring and unconditional FP16 fallback.  The tiered cache provides the compression savings of INT8 keys and INT4 values (44\% Tier-1 VRAM reduction; runtime savings depend on the FP16 key scratch buffer needed for the GQA union working set---see Table~\ref{tab:union}) while retaining the error profile of full-precision attention as a guaranteed fallback.
+The primary contribution of this work is not compression itself---KV cache quantization is well-established---but the \emph{certification framing}: formal per-head, per-step error bounds coupled with runtime monitoring and unconditional FP16 fallback.  The tiered cache provides the compression savings of INT8 keys and INT4 values (44\% Tier-1 VRAM reduction; runtime savings depend on the FP16 key scratch buffer needed for the GQA union working set---see Table~\ref{tab:union}) while retaining the error profile of full-precision attention as a guaranteed fallback.
 
 \textbf{The cost of the guarantee.}  With a symmetric 2048-block scratch cache, the certified system runs at $2.7\text{--}4.8\times$ the latency of dense Flash Attention across 8K--128K context (Table~\ref{tab:context_scaling}), with the overhead increasing at longer contexts due to H2D page-in traffic.  At 64K, an asymmetric cache (2048 key / 256 value blocks) achieves 260\,ms ($4.2\times$ dense)---4.6\% faster than symmetric 1536/1536---because key scratch dominates latency; the split-$K$ value fallback adds negligible cost at this context length (Table~\ref{tab:asymmetric_cache}).  At 128K, the value-cache knee is 512 blocks: 2048K/512V (${\sim}2.6$\,GB scratch) matches symmetric latency while saving 37\% of scratch; below 512 blocks the split-$K$ fallback becomes expensive (Section~\ref{sec:performance}).  The kernel overhead is an implementation artefact amenable to further fusion and caching optimisations, independent of the error bounds or fallback logic.  The H2D component ($11\%$ of step time at 64K) is an inherent cost of the sub-corpus cache architecture and can be traded against VRAM by increasing scratch capacity (Tables~\ref{tab:cache_sweep_64k}--\ref{tab:cache_sweep_128k}).  At 128K with symmetric 2048 blocks, the certified system saves 18\% VRAM vs.\ dense ($0.82\times$, Table~\ref{tab:memory}); retaining FP16 originals in system RAM (Tier-2) costs $\sim$17\,GB.  The fallback ladder is active but not uniformly at the same granularity: Rung~1 expansion and Rung~2 value promotion are near-universal step-level policies at 64K, while Rung~3 is a sparse per-head fallback that adds only 1.7\% of step time at 64K.
 
@@ -1458,7 +1458,7 @@ The primary contribution of this work is not compression itself---KV cache quant
 
 \textbf{Axes of improvement.}  Several independent developments could shift the operating point substantially, without changing the certification architecture or the fallback guarantee:
 
-\emph{Advanced quantisation schemes.}  The current INT8 key / INT4 value scheme with per-channel metadata yields 56\% Tier-1 storage (Table~\ref{tab:storage}), but the certification framework is not tied to this specific format.  The error decomposition (Section~\ref{sec:bounds}) applies to any block-quantised representation that admits a deterministic reconstruction bound.  Integrating recent advances in KV cache quantisation---the 2-bit asymmetric schemes of KIVI~\cite{kivi}, the sub-4-bit per-channel techniques of KVQuant~\cite{kvquant}, the online vector quantisation of TurboQuant~\cite{turboquant}, or the hardware-aware group-wise layouts of InnerQ~\cite{innerq} (Table~\ref{tab:positioning})---into the certified framework is a natural research direction.  Each brings a different compression--error tradeoff; the open question is whether the resulting bounds remain tight enough to keep fallback rates low and the guarantee practically useful.
+\emph{Advanced quantization schemes.}  The current INT8 key / INT4 value scheme with per-channel metadata yields 56\% Tier-1 storage (Table~\ref{tab:storage}), but the certification framework is not tied to this specific format.  The error decomposition (Section~\ref{sec:bounds}) applies to any block-quantized representation that admits a deterministic reconstruction bound.  Integrating recent advances in KV cache quantization---the 2-bit asymmetric schemes of KIVI~\cite{kivi}, the sub-4-bit per-channel techniques of KVQuant~\cite{kvquant}, the online vector quantization of TurboQuant~\cite{turboquant}, or the hardware-aware group-wise layouts of InnerQ~\cite{innerq} (Table~\ref{tab:positioning})---into the certified framework is a natural research direction.  Each brings a different compression--error tradeoff; the open question is whether the resulting bounds remain tight enough to keep fallback rates low and the guarantee practically useful.
 
 \emph{Tighter error bounds.}  The current $e^{3\Delta}$ mass inflation (Section~\ref{sec:scoring}) is conservative: it accounts for INT8 query scoring headroom that a tensor-core-native kernel could avoid.  Reducing this to $e^{2\Delta}$ or below would shrink the promoted set, reduce H2D traffic, and lower the latency overhead.  Similarly, a global value-error budget (rather than the current local promotion heuristic) would enable principled quality--latency tradeoffs.
 
@@ -1472,7 +1472,7 @@ The primary contribution of this work is not compression itself---KV cache quant
 
 \textbf{Conservative mass estimation.}  The implementation's $e^{3\Delta} \approx 1.72\times$ substitution (Section~\ref{sec:scoring}) means the selector promotes more blocks to FP16 than strictly necessary under FP16 query scoring ($e^{2\Delta} \approx 1.43\times$), wasting page-in bandwidth but not introducing error.
 
-\textbf{Architecture independence.}  The tiered cache, error decomposition, and fallback ladder are agnostic to the model architecture.  They require only standard scaled dot-product attention with a block-organised KV cache.  The per-channel INT8 key quantisation and per-group INT4 value quantisation adapt to different head dimensions and value distributions without model-specific tuning.
+\textbf{Architecture independence.}  The tiered cache, error decomposition, and fallback ladder are agnostic to the model architecture.  They require only standard scaled dot-product attention with a block-organised KV cache.  The per-channel INT8 key quantization and per-group INT4 value quantization adapt to different head dimensions and value distributions without model-specific tuning.
 
 
 % =============================================================
@@ -1481,7 +1481,7 @@ The primary contribution of this work is not compression itself---KV cache quant
 
 The certified guarantee is \emph{per-head, per-step}: it bounds $\norm{O_{\mathrm{quant}} - O_{\mathrm{ref}}}$ (Section~\ref{sec:decomposition}), not the distance to $O_{\mathrm{dense}}$.  It does not provide an end-to-end model-quality guarantee.  On NIAH at 64K (100 paired trials), dense and certified achieve identical 66\% accuracy with no statistically significant difference (exact McNemar $p{=}1.0$), but the NIAH precision ablation (Table~\ref{tab:niah_ablation}) demonstrates that individual precision components (INT4 values, INT8 tail keys, kernel numerical path) each contribute measurable variance at the per-trial level.  The aggregate effect cancels to noise at the operating point, but could become significant on tasks with sharper retrieval requirements or longer autoregressive chains.  The aggregate effect on model quality must therefore be assessed empirically per deployment.
 
-The system RAM requirement for Tier~2 (FP16 originals) equals the dense KV cache size---e.g., $\sim$16\,GB at 128K context on LLaMA~3.1-8B.  This is the price of the unconditional fallback guarantee.  Deployments with limited system RAM must either accept the system RAM cost or forgo the fallback (losing the ``certified'' property and reverting to standard quantisation).
+The system RAM requirement for Tier~2 (FP16 originals) equals the dense KV cache size---e.g., $\sim$16\,GB at 128K context on LLaMA~3.1-8B.  This is the price of the unconditional fallback guarantee.  Deployments with limited system RAM must either accept the system RAM cost or forgo the fallback (losing the ``certified'' property and reverting to standard quantization).
 
 At a realistic 2048-block scratch cache, the runtime overhead ranges from $2.7\times$ (8K) to $4.8\times$ (128K) dense latency (Table~\ref{tab:context_scaling}).  The dominant overhead components are the ranking-consistency check (28\% of step time at 64K) and H2D page-in (11\%), both amenable to optimisation (Section~\ref{sec:performance}).  VRAM savings materialise at 64K+ context when cache capacity is tuned: with symmetric caches, a 1536-block cache at 64K achieves ${\sim}0.94\times$ dense; with an asymmetric cache (2048 key / 256 value blocks, Table~\ref{tab:asymmetric_cache}), 64K drops to ${\sim}0.83\times$ dense with negligible latency impact.  At 128K, the asymmetric knee is 512 value blocks: 2048K/512V matches symmetric 2048/2048 latency while reducing scratch by 37\%; below 512 blocks the split-$K$ value fallback becomes expensive (Section~\ref{sec:performance}).  Below 64K the scratch allocation exceeds dense VRAM regardless of capacity.
 
@@ -1498,13 +1498,13 @@ We presented a tiered KV cache architecture that stores INT8 keys and INT4 value
 
 The system introduces a ranking-consistency check that detects when INT8 scoring noise distorts the attention distribution and triggers per-head fallback to dense attention.  This mechanism is critical: it converts a previously unaddressed silent failure mode into a detectable and recoverable event.  On retrieval-adversarial benchmarks, non-uniform precision across the sequence can otherwise cause attention dilution that degrades accuracy even when per-step error bounds are satisfied.
 
-On language modelling (PG-19), the certified system matches dense perplexity within measurement noise across all tested context lengths (8K--128K): $\Delta\mathrm{ppl}$ ranges from $-0.002$ to $+0.001$ with 95\% CIs including zero at every context length.  On structured long-context tasks (RULER, 7 subtasks), the certified system matches dense at 64K ($+0.015$, 20 slices) and 128K ($+0.004$, 20 slices), with the four RULER NIAH retrieval variants at or near dense performance across context lengths.  At 32K, a mild $-1.9$pp gap driven by CWE emerges (20 slices, 95\% CI nearly excludes zero); at 8K, a $-6.9$pp RULER gap is localised to three value-sensitive subtasks (VT, CWE, FWE) and is strongly consistent with INT4 value reconstruction error as the dominant mechanism---FP16-value ablations close the gap at both context lengths (8K to $-0.4$pp with 0 critical failures, 32K to $-0.5$pp), and tightening $v_{\mathrm{tol}}$ to 0.02 at 32K removes the gap in a targeted ablation (Section~\ref{sec:ruler_8k_ablation}).  On multi-needle retrieval (NIAH, 10 needles per trial, 100 paired trials each at 8K, 32K, 64K), no context length shows a statistically significant difference: exact McNemar $p{=}1.0$ at 8K, $p{=}0.727$ at 32K, and $p{=}1.0$ at 64K.  We observe and transparently report a residual kernel-path gap attributable to numerical precision differences between the certified kernel and Flash Attention, which is a property of the kernel implementation rather than the quantisation scheme.  The ranking-consistency check recovers the majority of this gap; a tensor-core-native kernel that matched Flash Attention's rounding may reduce the remainder, though the magnitude of any residual is unknown without implementation.
+On language modelling (PG-19), the certified system matches dense perplexity within measurement noise across all tested context lengths (8K--128K): $\Delta\mathrm{ppl}$ ranges from $-0.002$ to $+0.001$ with 95\% CIs including zero at every context length.  On structured long-context tasks (RULER, 7 subtasks), the certified system matches dense at 64K ($+0.015$, 20 slices) and 128K ($+0.004$, 20 slices), with the four RULER NIAH retrieval variants at or near dense performance across context lengths.  At 32K, a mild $-1.9$pp gap driven by CWE emerges (20 slices, 95\% CI nearly excludes zero); at 8K, a $-6.9$pp RULER gap is localised to three value-sensitive subtasks (VT, CWE, FWE) and is strongly consistent with INT4 value reconstruction error as the dominant mechanism---FP16-value ablations close the gap at both context lengths (8K to $-0.4$pp with 0 critical failures, 32K to $-0.5$pp), and tightening $v_{\mathrm{tol}}$ to 0.02 at 32K removes the gap in a targeted ablation (Section~\ref{sec:ruler_8k_ablation}).  On multi-needle retrieval (NIAH, 10 needles per trial, 100 paired trials each at 8K, 32K, 64K), no context length shows a statistically significant difference: exact McNemar $p{=}1.0$ at 8K, $p{=}0.727$ at 32K, and $p{=}1.0$ at 64K.  We observe and transparently report a residual kernel-path gap attributable to numerical precision differences between the certified kernel and Flash Attention, which is a property of the kernel implementation rather than the quantization scheme.  The ranking-consistency check recovers the majority of this gap; a tensor-core-native kernel that matched Flash Attention's rounding may reduce the remainder, though the magnitude of any residual is unknown without implementation.
 
-A naive INT8K/INT4V baseline---identical quantisation but with all certification and fallback disabled---substantially degrades retrieval (NIAH accuracy drops to 5--10\% vs.\ 39--66\% dense) and structured reasoning (RULER $-44$ to $-56$pp at all context lengths, VT 0\% everywhere).  The certified system recovers nearly all of this loss, indicating that the certification and fallback machinery is not merely monitoring overhead, but a primary mechanism by which the system preserves quality under aggressive quantisation (Section~\ref{sec:naive}).
+A naive INT8K/INT4V baseline---identical quantization but with all certification and fallback disabled---substantially degrades retrieval (NIAH accuracy drops to 5--10\% vs.\ 39--66\% dense) and structured reasoning (RULER $-44$ to $-56$pp at all context lengths, VT 0\% everywhere).  The certified system recovers nearly all of this loss, indicating that the certification and fallback machinery is not merely monitoring overhead, but a primary mechanism by which the system preserves quality under aggressive quantization (Section~\ref{sec:naive}).
 
 At a realistic 2048-block scratch cache, the certified system runs at $2.7\text{--}4.8\times$ the latency of dense Flash Attention across 8K--128K context (Table~\ref{tab:context_scaling}), with the overhead dominated by the ranking-consistency check and H2D page-in.  The kernel overhead is an implementation artefact independent of the error bounds; the remaining overhead is amenable to fusion and caching optimisations (Section~\ref{sec:performance}).  Meaningful VRAM savings materialise at 64K+ when scratch capacity is tuned: ${\sim}0.83\times$ dense at 64K with an asymmetric 2048K/256V cache, or ${\sim}0.72\times$ at 128K with 2048K/512V---both at no latency cost relative to symmetric caches (Table~\ref{tab:asymmetric_cache}).
 
-The approach requires no model retraining or dataset-specific calibration and applies to any transformer with standard attention.  More broadly, it reframes KV cache quantisation as a runtime-verified computation rather than a fixed approximation.
+The approach requires no model retraining or dataset-specific calibration and applies to any transformer with standard attention.  More broadly, it reframes KV cache quantization as a runtime-verified computation rather than a fixed approximation.
 
 
 
@@ -1512,10 +1512,10 @@ The approach requires no model retraining or dataset-specific calibration and ap
 
 Source code (CUDA/Triton kernels, certified attention implementation, and benchmark scripts), raw result JSONs, per-trial pass/fail matrices, and the \LaTeX{} source of this paper are available at:
 \begin{center}
-\url{https://github.com/DeanoC/certified-quantised-attention}
+\url{https://github.com/DeanoC/certified-quantized-attention}
 \end{center}
 An archived snapshot is deposited on Zenodo~\cite{zenodo_artifact} with DOI \href{https://doi.org/10.5281/zenodo.19915933}{\texttt{10.5281/zenodo.19915933}}.
-The repository includes the exact model configuration, quantisation parameters, and seeds used for all reported experiments.  The version corresponding to this paper is tagged \texttt{arxiv-v1}; all results can be reproduced from that tag.  The repository is released under the MIT licence.
+The repository includes the exact model configuration, quantization parameters, and seeds used for all reported experiments.  The version corresponding to this paper is tagged \texttt{arxiv-v1}; all results can be reproduced from that tag.  The repository is released under the MIT licence.
 
 % =============================================================
 % References
@@ -1663,7 +1663,7 @@ Ning, R., Zhang, W., and Lai, F.
 
 \bibitem{zenodo_artifact}
 Calver, D.
-\newblock Certified Quantised Attention --- artifact repository (version \texttt{arxiv-v1}).
+\newblock Certified Quantized Attention --- artifact repository (version \texttt{arxiv-v1}).
 \newblock Zenodo, 2026.
 \newblock \href{https://doi.org/10.5281/zenodo.19915933}{\texttt{doi:10.5281/zenodo.19915933}}.
 
@@ -1729,14 +1729,14 @@ This bound is tight (attained by the above construction), independent of $N$, an
 
 \begin{lemma}[Tail-restricted TV bound]
 \label{lem:tail_tv}
-Let $\mathcal{F}$ (FP16 set) and $\mathcal{T}$ (INT8 tail set) partition the $N$ tokens, with scores in $\mathcal{F}$ computed exactly (zero quantisation error) and scores in $\mathcal{T}$ perturbed by at most $\Delta$.  Let $\alpha_{\mathcal{T}} = \sum_{t \in \mathcal{T}} a_t$ denote the true tail mass.  Then:
+Let $\mathcal{F}$ (FP16 set) and $\mathcal{T}$ (INT8 tail set) partition the $N$ tokens, with scores in $\mathcal{F}$ computed exactly (zero quantization error) and scores in $\mathcal{T}$ perturbed by at most $\Delta$.  Let $\alpha_{\mathcal{T}} = \sum_{t \in \mathcal{T}} a_t$ denote the true tail mass.  Then:
 \[
   \mathrm{TV}(a, a') \leq \alpha_{\mathcal{T}} \cdot (e^{2\Delta} - 1)
 \]
 \end{lemma}
 
 \begin{proof}
-Write $a_t' = \exp(s_t')/Z'$.  For FP16 tokens $t \in \mathcal{F}$, $s_t' = s_t$ (no quantisation error), so:
+Write $a_t' = \exp(s_t')/Z'$.  For FP16 tokens $t \in \mathcal{F}$, $s_t' = s_t$ (no quantization error), so:
 \[
   a_t' = \frac{\exp(s_t)}{Z'} = a_t \cdot \frac{Z}{Z'}
 \]
@@ -1827,14 +1827,14 @@ Kernel bypassed (torch SDPA) & 72\% & 72\% & $0$ & Kernel path isolated \\
 
 The ablation reveals three independent sources of the tiered--dense gap on NIAH:
 
-\textbf{INT4 value quantisation ($\sim$6pp at $k_{\max}{=}\infty$).}  INT4 values with $g{=}16$ introduce $\sim$5\% relative reconstruction error.  For perplexity this is negligible ($\Delta\mathrm{ppl} < 0.005$), but NIAH's reliance on exact value content for the needle tokens makes it more sensitive.  The value escalation mechanism (Rung~2, triggered by $\eta_b$) addresses this for blocks with high reconstruction error.
+\textbf{INT4 value quantization ($\sim$6pp at $k_{\max}{=}\infty$).}  INT4 values with $g{=}16$ introduce $\sim$5\% relative reconstruction error.  For perplexity this is negligible ($\Delta\mathrm{ppl} < 0.005$), but NIAH's reliance on exact value content for the needle tokens makes it more sensitive.  The value escalation mechanism (Rung~2, triggered by $\eta_b$) addresses this for blocks with high reconstruction error.
 
 \textbf{INT8 key scoring on tail blocks ($\sim$4pp).}  With the operating-point cap $k_{\max}{=}128$, roughly 15\% of blocks remain on INT8 keys.  Their slightly perturbed scores shift the softmax denominator, redistributing attention mass away from the needle.  Paradoxically, promoting \emph{more} blocks to FP16 ($k_{\max}{=}\infty$, $K^*{\approx}221$) makes this \emph{worse}: the newly promoted blocks' FP16 scores are more accurate (higher) than their INT8 estimates, increasing their softmax share at the needle's expense.  The ranking-consistency check (Section~\ref{sec:ranking_consistency}) detects and corrects this per-head.
 
-\textbf{Kernel numerical path ($\sim$4pp residual).}  The certified attention kernel uses a different computational path from \torchsdpa{} (which dispatches to Flash Attention with tensor-core TF32/FP16 matmul and FP32 accumulation).  The different rounding paths produce $\sim$1e-7 max absolute difference per step, which compounds through 32 layers of autoregressive decoding.  In this ablation, upgrading the online-softmax scalars to FP64 recovered $\sim$2pp of this gap; all main results in the paper use FP32 accumulators throughout (Section~\ref{sec:numerical}).  The remaining $\sim$4pp is an inherent property of the matmul implementation, not the quantisation scheme, and would be expected to be reduced by a tensor-core-native certified kernel.
+\textbf{Kernel numerical path ($\sim$4pp residual).}  The certified attention kernel uses a different computational path from \torchsdpa{} (which dispatches to Flash Attention with tensor-core TF32/FP16 matmul and FP32 accumulation).  The different rounding paths produce $\sim$1e-7 max absolute difference per step, which compounds through 32 layers of autoregressive decoding.  In this ablation, upgrading the online-softmax scalars to FP64 recovered $\sim$2pp of this gap; all main results in the paper use FP32 accumulators throughout (Section~\ref{sec:numerical}).  The remaining $\sim$4pp is an inherent property of the matmul implementation, not the quantization scheme, and would be expected to be reduced by a tensor-core-native certified kernel.
 
-\textbf{Implication for the certified claim.}  The certification guarantee (Section~\ref{sec:bounds}) bounds the per-head, per-step output perturbation from quantisation.  The NIAH ablation shows that on retrieval-adversarial benchmarks, even perturbations within the certified bound can affect downstream accuracy through the argmax over output logits.  This is a known limitation of per-step bounds (Section~\ref{sec:limitations}).  For language modelling quality (PG-19), where the metric averages over all tokens, the certified system matches dense within measurement noise.
+\textbf{Implication for the certified claim.}  The certification guarantee (Section~\ref{sec:bounds}) bounds the per-head, per-step output perturbation from quantization.  The NIAH ablation shows that on retrieval-adversarial benchmarks, even perturbations within the certified bound can affect downstream accuracy through the argmax over output logits.  This is a known limitation of per-step bounds (Section~\ref{sec:limitations}).  For language modelling quality (PG-19), where the metric averages over all tokens, the certified system matches dense within measurement noise.
 
-\textbf{Confirmation from RULER 8K ablation.}  The 8K RULER ablation (Section~\ref{sec:ruler_8k_ablation}) provides independent corroboration of the value-side hypothesis: sweeping $K_{\max}$ from 64 to 512 does not close the gap on VT/CWE/FWE, but replacing INT4 values with FP16 values reduces the aggregate gap from $-6.9$pp to $-0.4$pp with zero critical failures.  This confirms that INT4 value reconstruction error---not key quantisation---is the dominant source of quality loss on value-sensitive tasks at short contexts.
+\textbf{Confirmation from RULER 8K ablation.}  The 8K RULER ablation (Section~\ref{sec:ruler_8k_ablation}) provides independent corroboration of the value-side hypothesis: sweeping $K_{\max}$ from 64 to 512 does not close the gap on VT/CWE/FWE, but replacing INT4 values with FP16 values reduces the aggregate gap from $-6.9$pp to $-0.4$pp with zero critical failures.  This confirms that INT4 value reconstruction error---not key quantization---is the dominant source of quality loss on value-sensitive tasks at short contexts.
 
 \end{document}
