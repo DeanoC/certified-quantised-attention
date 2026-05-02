@@ -1,4 +1,4 @@
-# Runtime Certified Bounded Error Quantised Attention
+# Runtime Certified Bounded Error Quantized Attention
 
 Reviewer-facing artifact for the paper in
 `paper/runtime_certified_bounded_error_quantized_attention.tex` (PDF alongside).
